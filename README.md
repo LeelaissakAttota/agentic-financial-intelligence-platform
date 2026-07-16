@@ -2,8 +2,8 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-247%20passing-brightgreen.svg)](https://github.com/yourusername/agentic-financial-intelligence-platform/actions)
-[![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-4/7-orange.svg)](#implementation-status)
+[![Tests](https://img.shields.io/badge/Tests-284%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
+[![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-7/7-green.svg)](#implementation-status)
 
 > **An AI-powered financial research system that automates financial document analysis, sentiment analysis, risk assessment, and competitive intelligence through a multi-agent architecture with Retrieval-Augmented Generation (RAG) capabilities.**
 
@@ -140,7 +140,7 @@ flowchart TD
 
 ### Component Details
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                 AGENTIC FINANCIAL INTELLIGENCE PLATFORM         │
 ├─────────────────────────────────────────────────────────────────┤
@@ -150,17 +150,14 @@ flowchart TD
 │  • Result aggregation and persistence                           │
 │                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
-│  Implemented Agents:                                            │
+│  Implemented Agents (7/7):                                      │
 │  • Financial Document Agent  ✅ (RAG-based financial analysis)    │
 │  • Sentiment Analysis Agent  ✅ (Multi-source sentiment analysis) │
 │  • Risk Assessment Agent     ✅ (Multi-category risk assessment)  │
 │  • Competitive Intelligence  ✅ (Peer comparison analysis)       │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  Planned Agents (Future Implementation):                        │
-│  • News Agent              ⏳ (Financial news processing)       │
-│  • Market Data Agent       ⏳ (Market data & technical analysis)│
-│  • Investment Summary      ⏳ (Multi-agent synthesis)          │
+│  • News Intelligence Agent   ✅ (Financial news processing)       │
+│  • Market Data Agent         ✅ (Real-time market data & analysis)│
+│  • Investment Summary Agent  ✅ (Multi-agent synthesis)          │
 │                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │  Supporting Systems:                                            │
@@ -358,17 +355,17 @@ User Receives: Structured JSON with all agent outputs and metadata
 - ✅ **Multi-source Sentiment Analysis**: News, social media, and analyst sentiment with source weighting
 - ✅ **Risk Assessment Analysis**: Market, credit, operational, and liquidity risk evaluation
 - ✅ **Competitive Intelligence**: Peer comparison and competitive positioning analysis
+- ✅ **News Intelligence**: Financial news aggregation, sentiment, and event detection
+- ✅ **Market Data Analysis**: Real-time market data, technical indicators, and fundamentals
+- ✅ **Investment Summary**: Multi-agent insight synthesis and thesis formulation
 - ✅ **Persistent Knowledge Storage**: PostgreSQL storage of research history and executions
 - ✅ **Flexible LLM Integration**: OpenRouter primary with OpenAI/Anthropic fallbacks
 - ✅ **REST API**: Full CRUD interface for research jobs and results
 - ✅ **Interactive Dashboard**: Streamlit interface with real-time agent monitoring
-- ✅ **Automated Testing**: 247 unit tests passing (>90% coverage)
+- ✅ **Automated Testing**: 284 unit tests passing (>90% coverage)
 - ✅ **Docker Deployment**: Containerized services with docker-compose orchestration
 
 ### Planned Features (Future Implementation)
-- ⏸️ **News Agent**: Financial news aggregation and sentiment analysis
-- ⏸️ **Market Data Agent**: Technical/fundamental market data processing
-- ⏸️ **Investment Summary Agent**: Multi-agent insight synthesis and thesis formulation
 - ⏸️ **Parallel Execution**: Enable concurrent agent execution where dependencies allow
 - ⏸️ **Enhanced Context Passing**: Share relevant outputs between agents
 - ⏸️ **Dynamic Task Planning**: LLM-driven agent sequencing based on query complexity
@@ -417,9 +414,22 @@ agentic-financial-intelligence-platform/
 │   │   ├── schemas.py
 │   │   ├── prompts.py
 │   │   └── exceptions.py
-│   ├── news_agent/               # ⏳ Stub (to be implemented)
-│   ├── market_data_agent/        # ⏳ Stub (to be implemented)
-│   ├── investment_summary_agent/   # ⏳ Stub (to be implemented)
+│   ├── news_agent/                # ✅ Implemented (news intelligence)
+│   │   ├── agent.py
+│   │   ├── schemas.py
+│   │   ├── prompts.py
+│   │   ├── exceptions.py
+│   │   └── news_agent.py
+│   ├── market_data_agent/         # ✅ Implemented (real-time data)
+│   │   ├── market_agent.py
+│   │   ├── schemas.py
+│   │   ├── prompts.py
+│   │   └── exceptions.py
+│   ├── investment_summary_agent/  # ✅ Implemented (synthesis)
+│   │   ├── agent.py
+│   │   ├── schemas.py
+│   │   ├── prompts.py
+│   │   └── exceptions.py
 │   └── manager_agent/            # ✅ Implemented (orchestration)
 │       ├── manager.py            # Core orchestration logic
 │       ├── schemas.py            # Task types and data models
