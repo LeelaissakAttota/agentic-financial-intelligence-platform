@@ -20,3 +20,28 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Large data files (use Git LFS or external storage)
+data/processed/onnx_models/
+data/processed/embedding_cache/
+data/processed/chroma/
+data/reports/
+*.onnx
+*.onnx.tar.gz
+
+# Docker
+Dockerfile.backup
+docker-compose.yml.backup
+docker-compose.yml.bak2
+docker-compose.yml.streamlit-backup
+
+# Backup files
+*.backup
+*.bak
+*.bak2
+
+# Reports (generated)
+BUG_REPORT.md
+PERFORMANCE_REPORT.md
+QUALITY_REPORT.md
+TEST_REPORT.md
