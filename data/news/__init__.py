@@ -25,13 +25,22 @@ from data.news.cache import (
 
 from data.news.providers import (
     get_news_provider,
+    close_news_provider,
     CompositeNewsProvider,
     YahooFinanceNewsProvider,
     FinnhubNewsProvider,
     AlphaVantageNewsProvider,
     NewsAPIProvider,
     RSSProvider,
-    GoogleNewsRSSProvider
+    create_google_news_provider,
+    create_marketwatch_provider,
+    create_cnbc_provider,
+    create_reuters_business_provider,
+    create_bloomberg_provider,
+    create_financial_times_provider,
+    create_wall_street_journal_provider,
+    create_seeking_alpha_provider,
+    create_benzinga_provider,
 )
 
 __all__ = [
@@ -56,11 +65,20 @@ __all__ = [
     
     # Providers
     "get_news_provider",
+    "close_news_provider",
     "CompositeNewsProvider",
     "YahooFinanceNewsProvider",
     "FinnhubNewsProvider",
     "AlphaVantageNewsProvider",
     "NewsAPIProvider",
-    "RSSNewsProvider",
-    "GoogleNewsRSSProvider"
+    "RSSProvider",
+    "create_google_news_provider",
+    "create_marketwatch_provider",
+    "create_cnbc_provider",
+    "create_reuters_business_provider",
+    "create_bloomberg_provider",
+    "create_financial_times_provider",
+    "create_wall_street_journal_provider",
+    "create_seeking_alpha_provider",
+    "create_benzinga_provider",
 ]
