@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: financial-research-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-financial_research_agent}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - financial-research-network
+
+  chromadb:
+    image: chromadb/chroma:0.5.5
+    container_name: financial-research-chromadb
+    environment:
+      CHROMA_SERVER_HOST: 0.0.0.0
+      CHROMA_SERVER_HTTP_PORT: 8000
+    volumes:
+      - chromadb_data:/chroma/chroma
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - financial-research-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financial-research-api
+    environment:
+      # LLM Provider
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      PRIMARY_MODEL: ${PRIMARY_MODEL:-anthropic/claude-3.5-sonnet}
+      FAST_MODEL: ${FAST_MODEL:-anthropic/claude-3-haiku}
+      
+      # Database
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-financial_research_agent}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      
+      # ChromaDB
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+      CHROMA_COLLECTION_NAME: ${CHROMA_COLLECTION_NAME:-financial_reports}
+      
+      # RAG Configuration
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-m3}
+      EMBEDDING_DEVICE: ${EMBEDDING_DEVICE:-cpu}
+      EMBEDDING_BATCH_SIZE: ${EMBEDDING_BATCH_SIZE:-32}
+      CHUNK_SIZE: ${CHUNK_SIZE:-512}
+      CHUNK_OVERLAP: ${CHUNK_OVERLAP:-50}
+      RETRIEVAL_TOP_K: ${RETRIEVAL_TOP_K:-20}
+      RETRIEVAL_RERANK_TOP_K: ${RETRIEVAL_RERANK_TOP_K:-10}
+      RETRIEVAL_SCORE_THRESHOLD: ${RETRIEVAL_SCORE_THRESHOLD:-0.5}
+      RERANKER_MODEL: ${RERANKER_MODEL:-BAAI/bge-reranker-v2-m3}
+      RERANKER_DEVICE: ${RERANKER_DEVICE:-cpu}
+      RERANKER_BATCH_SIZE: ${RERANKER_BATCH_SIZE:-16}
+      
+      # Paths
+      CHROMA_PERSIST_DIR: /app/data/processed/chroma
+      EMBEDDING_CACHE_DIR: /app/data/processed/embedding_cache
+      REPORT_OUTPUT_DIR: /app/data/reports
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - financial-research-network
+    restart: unless-stopped
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financial-research-streamlit
+    command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-financial_research_agent}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "8501:8501"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - api
+      - postgres
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - financial-research-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  chromadb_data:
+
+networks:
+  financial-research-network:
+    driver: bridge

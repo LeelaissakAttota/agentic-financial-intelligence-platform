@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.egg
+*.egg-info
+.distutils
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.spyderpy3
+.ipynb_checkpoints
+# Virtual environments
+env
+venv
+.venv
+env.bak
+.venv.bak
+# Environment variables
+.env
+.env.*  # but we might want to keep .env.example? We'll ignore .env but keep .env.example
+!.env.example
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+# Testing
+.cache
+.pytest_cache
+.hypothesis
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+# Documentation
+docs/_build/
+# Data and logs (we want to keep the directory structure but not the contents)
+data/reports/*
+data/processed/chroma/*
+logs/*
+# Docker
+docker-compose.override.yml
+.dockerignore
+# Misc
+.DS_Store
+Thumbs.db

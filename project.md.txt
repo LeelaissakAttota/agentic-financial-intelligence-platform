@@ -1,0 +1,151 @@
+# AI Financial Research Analyst Agent
+## Project Memory
+
+## Architecture
+
+Multi-Agent AI Financial Research System.
+
+Flow:
+
+User
+ |
+Manager Agent
+ |
+--------------------------------
+|        |        |             |
+News   Market   Financial    Risk
+Agent  Agent    Report       Agent
+
+ |
+Sentiment Agent
+
+ |
+Investment Summary Agent
+
+ |
+Final Research Report
+
+
+## Completed Components
+
+### LLM Layer
+Status: COMPLETED
+
+Provider:
+OpenRouter
+
+Architecture:
+
+Agents
+ |
+Model Router
+ |
+OpenRouter Client
+ |
+LLM Models
+
+
+Features:
+- JSON output enforcement
+- Token tracking
+- Cost tracking
+- Model routing
+
+
+## Completed Agents
+
+### Manager Agent
+
+Status:
+Completed
+
+Features:
+- Task planning
+- Worker coordination
+- Error handling
+
+
+### News Agent
+
+Status:
+Completed
+
+Features:
+- News analysis
+- Sentiment impact
+- JSON output
+
+
+### Market Agent
+
+Status:
+Completed
+
+Features:
+- Market data analysis
+- Price metrics
+- Valuation
+
+
+### Financial Report Agent
+
+Status:
+Completed
+
+Features:
+- Market outlook
+- Trade analysis
+- Risk reports
+- Performance reports
+
+
+## RAG Foundation
+
+Status:
+Completed
+
+
+Technology:
+
+PDF Processing:
+PyMuPDF
+
+
+Chunking:
+Section-aware splitter
+
+
+Embedding:
+BGE-M3
+
+
+Vector Database:
+ChromaDB
+
+
+Reranker:
+BGE-Reranker-v2-M3
+
+
+## Current Next Tasks
+
+Implement:
+
+1. Sentiment Agent
+
+2. Risk Agent
+
+3. Competitor Analysis Agent
+
+4. Investment Summary Agent
+
+
+## Development Rules
+
+- Use OpenRouter only
+- Avoid direct Anthropic API
+- Use low token consumption
+- Keep responses short
+- Do not repeat previous explanations
+- Always inspect existing files first
+- Use existing architecture

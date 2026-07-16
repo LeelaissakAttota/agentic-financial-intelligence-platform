@@ -1,0 +1,30 @@
+# Model Registry Configuration
+# Maps agents to models based on task complexity
+# Update this file to change model routing - no code changes needed
+
+agent_models:
+  manager_agent:
+    complex: "anthropic/claude-sonnet-5"
+  risk_agent:
+    complex: "anthropic/claude-sonnet-5"
+  investment_summary_agent:
+    complex: "anthropic/claude-sonnet-5"
+  news_agent:
+    simple: "anthropic/claude-3-haiku"
+  market_agent:
+    medium: "anthropic/claude-sonnet-5"
+  financial_report_agent:
+    complex: "anthropic/claude-sonnet-5"
+  sentiment_agent:
+    simple: "anthropic/claude-3-haiku"
+  competitor_agent:
+    complex: "anthropic/claude-sonnet-5"
+
+complexity_defaults:
+  complex: "anthropic/claude-sonnet-5"
+  medium: "anthropic/claude-sonnet-5"
+  simple: "anthropic/claude-3-haiku"
+
+settings_aliases:
+  primary_model: "anthropic/claude-sonnet-5"
+  fast_model: "anthropic/claude-3-haiku"
