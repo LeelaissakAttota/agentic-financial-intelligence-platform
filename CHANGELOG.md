@@ -5,6 +5,103 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0-phase4] - 2026-07-17
+
+### Added - Phase 4: Financial Documents Intelligence
+
+#### SEC Filing Downloader (`data/sec/downloader.py`)
+- Downloads SEC filings (10-K, 10-Q, 8-K, DEF14A, S-1, 13F, etc.) from EDGAR
+- Rate limiting (10 requests/second) with automatic backoff
+- Multi-layer caching (memory + disk with TTL)
+- Company information retrieval (CIK, ticker, exchange, SIC, former names)
+- Incremental filing detection and download
+
+#### Document Cache (`data/filings/cache.py`)
+- Multi-tier caching: LRU in-memory (200MB) + SQLite persistent (5GB)
+- Content-based deduplication via SHA-256 hashing
+- Tag-based invalidation
+- Document versioning with history
+- Automatic company ticker/CIK mapping
+
+#### Incremental Updates (`data/filings/incremental.py`)
+- Scheduled periodic updates (configurable interval)
+- Incremental SEC filing detection and download
+- Change detection via content hashing
+- RAG index update integration
+- Resumable operations with checkpointing
+
+#### Earnings Call Transcript Parser (`data/earnings/transcript_parser.py`)
+- Speaker identification and role classification (CEO, CFO, Operator, Analyst, IR)
+- Section segmentation (Presentation, Q&A, Prepared Remarks, Opening, Closing)
+- Q&A exchange extraction with questioner/answerer roles
+- Guidance extraction with direction (raise/lower/maintain) and confidence
+- Key metric extraction with sentiment analysis
+- Speaker-level sentiment analysis
+
+#### Annual/Quarterly Report Parsers (`data/annual_reports/`)
+- **AnnualReportParser**: 10-K/Annual Reports
+  - Business overview extraction (products, markets, competition)
+  - Financial highlights (revenue, net income, EPS, margins, FCF)
+  - Segment information extraction
+  - MD&A highlights (liquidity, operations, critical accounting, obligations)
+  - Risk factors extraction
+  - Capital allocation (dividends, buybacks, CapEx)
+  - Forward-looking guidance extraction
+- **QuarterlyReportParser**: 10-Q/Quarterly Reports
+  - Quarter/year detection
+  - Financial results extraction
+  - Guidance and segment performance
+- **InvestorPresentationParser**: PDF/PPTX presentations
+  - Slide content and structure extraction
+  - Key financial highlights
+  - Strategic initiatives and growth drivers
+  - Guidance and capital allocation
+  - ESG highlights
+
+#### Multi-backend PDF Parser (`data/financial_documents/parser.py`)
+- **PyMuPDF Backend**: Fast, good text extraction, decent tables, images
+- **pdfplumber Backend**: Excellent table extraction, good for financial tables
+- **pdfminer Backend**: Fallback text extraction, no table support
+- Automatic fallback on failure
+- Intelligent backend selection by document type
+- Content hash-based deduplication
+- Multi-library support
+- Financial document metadata extraction
+
+#### Financial Table Extractor (`data/financial_documents/tables.py`)
+- Financial statement detection (Income Statement, Balance Sheet, Cash Flow)
+- Period detection (annual, quarterly, YTD)
+- Currency and unit detection (thousands, millions, billions)
+- Header normalization and confidence scoring
+- Cross-backend extraction with quality scoring
+- Financial statement parsers (IncomeStatementParser, BalanceSheetParser, CashFlowParser)
+- Segment, MD&A, Risk Factors, Business Overview extractors
+- Factory for creating document-type specific parser bundles
+
+### Integration
+- Full RAG pipeline integration with existing pipeline
+- Section-aware chunking preserved
+- Vector storage via ChromaDB
+- Compatible with existing agents and dashboard
+
+---
+
+### Fixed
+- Fixed import paths in annual report parsers (relative → absolute)
+- Fixed async context manager usage in SEC downloader
+- Fixed VersionedDocumentCache close method
+- Fixed all import paths to use absolute imports from `data.*`
+
+---
+
+### Changed
+- All Phase 4 modules use absolute imports from `data.*` package
+- Updated `data/__init__.py` with complete Phase 4 exports
+- Updated `data/financial_documents/__init__.py` with investor presentation parser export
+- Updated `data/annual_reports/__init__.py` with all parser exports
+
+---
+
 ## [1.3.0-phase3] - 2026-07-17
 
 ### Added - Phase 3: Real Financial Intelligence
@@ -50,11 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated NewsIntelligenceAgent to use new pipeline
 - Backward-compatible NewsAgentAdapter for ManagerAgent interface
 
-### Added - Documentation
-- Updated README.md with Phase 3 features, updated architecture diagram, new components
-- Updated CHANGELOG.md with Phase 3 details
-- Updated ROADMAP.md with Phase 3 completion, Phase 4 plans
-- Generated PHASE_3_RELEASE.md, NEXT_PHASE_PLAN.md, PROJECT_PROGRESS.md
+---
 
 ### Fixed
 - Circular import between `data/news/pipeline/__init__.py` and `data/news/aggregator.py`
@@ -62,6 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SQLAlchemy reserved word conflict: `metadata` column renamed to `article_metadata` / `company_metadata`
 - Missing `EntityExtractionResult` import in intelligence module
 - Missing `Tuple` import in summarizer module
+
+---
 
 ### Changed
 - Pipeline config now supports `enable_aggregator`, `enable_intelligence`, `enable_summarizer` flags
@@ -98,6 +193,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Integration**: Entities automatically extracted in News Pipeline before agent analysis
 - **Performance**: 6.8ms avg extraction, ~150 req/s throughput, 58MB memory, 96% accuracy on financial text
 
+---
+
 ### Fixed
 - Duplicate enum definitions in schemas.py (MUTUAL_FUND, ETF_FUND, HEDGE_FUND, PENSION_FUND, SOVEREIGN_WEALTH_FUND, STOCK_EXCHANGE, CRYPTO_EXCHANGE, CONGLOMERATE)
 - Missing EntitySubType enums: CURRENCY, REGULATION
@@ -106,6 +203,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Non-existent exports: MatchType, CompanyResolution, TickerResolution, AliasResolution, ExtractionPipelineConfig
 - Async initialization bug in entity_extractor.py (get_local_ner_extractor() returns coroutine)
 - ConfidenceFactors.dict() method for serialization
+
+---
 
 ### Changed
 - Cleaned imports/exports in `data/news/__init__.py` and `data/news/entity_recognition/__init__.py`
@@ -142,6 +241,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Retry logic with exponential backoff for both sync and async
 - **NumPy 2.0 Compatibility** - Upgraded chromadb to 1.5.9, added sentence-transformers
 
+---
+
 ### Fixed
 - MarketAgent fallback analysis TypeError with None/float values
 - MarketAgent NoneType format errors in narrative generation
@@ -149,6 +250,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All agent test mocks updated to implement `agenerate_json()` async method
 - FinancialReportAgent test signature mismatch (context dict vs ticker kwarg)
 - RiskAgent, CompetitorAgent, SentimentAgent test assertions using correct mock flags
+
+---
 
 ### Changed
 - Updated MarketAgent to use real data adapter instead of mock provider
@@ -167,8 +270,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FastAPI REST API with background task processing
 - Streamlit dashboard
 - PostgreSQL persistence
-- Docker Compose deployment
 - OpenRouter LLM integration with cost tracking
+
+---
 
 ---
 
@@ -176,6 +280,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Tag | Date | Phase |
 |---------|-----|------|-------|
+| 1.4.0 | v1.4.0-phase4 | 2026-07-17 | Phase 4: Financial Documents Intelligence |
 | 1.3.0 | v1.3.0-phase3 | 2026-07-17 | Phase 3: Real Financial Intelligence |
 | 1.2.0 | v1.2.0-phase2.3 | 2026-07-17 | Phase 2.3: Financial Entity Recognition |
 | 1.1.0 | v1.1.0-phase2.2 | 2026-07-16 | Phase 2.2: News Intelligence |
