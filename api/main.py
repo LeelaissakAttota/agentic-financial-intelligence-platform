@@ -16,6 +16,7 @@ from config.settings import Settings
 from database import (
     init_db,
     get_session,
+    get_engine,
     get_company_reports,
     get_report_by_id,
     get_agent_runs_for_report,
@@ -33,10 +34,13 @@ from agents.competitor_agent.agent import CompetitorAgent
 from agents.investment_summary_agent.agent import InvestmentSummaryAgent
 from llm.openrouter_client import OpenRouterClient
 
+# Database setup
+from database import init_db, get_session, get_engine
+from database.models import Company, Report, AgentRun
 
-# Global settings
+# Global settings and engine
 settings = Settings()
-
+engine = get_engine(settings)
 
 # Database initialization on startup
 @asynccontextmanager
@@ -46,8 +50,7 @@ async def lifespan(app: FastAPI):
     init_db(settings)
     yield
     # Shutdown
-    pass
-
+    engine.dispose()
 
 app = FastAPI(
     title="Financial Research Agent API",
@@ -128,20 +131,17 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
     analysis = analysis_store[analysis_id]
     analysis["status"] = "running"
     analysis["updated_at"] = datetime.utcnow()
-    
+
     try:
         # Run the pipeline asynchronously
-        settings = Settings()
-        init_db(settings)
-        
         llm_provider = OpenRouterClient(
             api_key=settings.openrouter_api_key,
             base_url=settings.openrouter_base_url,
         )
-        
+
         # Initialize ManagerAgent
         manager = ManagerAgent(llm_provider=llm_provider)
-        
+
         # Register all worker agents
         manager.register_worker(TaskType.NEWS_ANALYSIS, NewsAgent(llm_provider=llm_provider))
         manager.register_worker(TaskType.MARKET_DATA, MarketAgent(llm_provider=llm_provider))
@@ -150,10 +150,10 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
         manager.register_worker(TaskType.RISK_ANALYSIS, RiskAgent(llm_provider=llm_provider))
         manager.register_worker(TaskType.COMPETITOR_ANALYSIS, CompetitorAgent(llm_provider=llm_provider))
         manager.register_worker(TaskType.INVESTMENT_SUMMARY, InvestmentSummaryAgent(llm_provider=llm_provider))
-        
+
         # Run the pipeline
         result = await manager.run(company=company, query=ticker)
-        
+
         # DEBUG: Log result structure
         import logging
         logger = logging.getLogger(__name__)
@@ -162,8 +162,8 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
         logger.info(f"Manager result.results keys: {list(result.results.keys()) if result.results else 'None'}")
         for k, v in (result.results.items() if result.results else []):
             logger.info(f"  Result {k}: type={type(v)}, keys={list(v.keys()) if isinstance(v, dict) else 'N/A'}")
-        
-        # Persist to database
+
+        # Persist to database using the global engine
         session = get_session(settings)
         try:
             logger.info("About to call persist_pipeline_result")
@@ -172,7 +172,7 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
             session.commit()
         finally:
             session.close()
-        
+
         analysis["status"] = "completed"
         analysis["results"] = result.model_dump()
         logger.info("result.model_dump() succeeded")
@@ -213,16 +213,16 @@ async def detailed_health_check():
         "database": "unknown",
         "chromadb": "unknown",
     }
-    
-    # Check database
+
+    # Check database using the global engine
     try:
-        session = get_session(settings)
-        session.execute("SELECT 1")
-        session.close()
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
         checks["database"] = "healthy"
     except Exception:
         checks["database"] = "unhealthy"
-    
+
     # Check ChromaDB
     try:
         import requests
@@ -233,9 +233,9 @@ async def detailed_health_check():
             checks["chromadb"] = "unhealthy"
     except Exception:
         checks["chromadb"] = "unhealthy"
-    
+
     overall = "healthy" if all(v == "healthy" for v in checks.values()) else "degraded"
-    
+
     return {
         "status": overall,
         "checks": checks,
@@ -247,7 +247,7 @@ async def detailed_health_check():
 async def start_analysis(request: AnalysisRequest, background_tasks: BackgroundTasks):
     """Start a new financial analysis."""
     analysis_id = str(uuid.uuid4())
-    
+
     analysis_store[analysis_id] = {
         "analysis_id": analysis_id,
         "company": request.company,
@@ -259,10 +259,10 @@ async def start_analysis(request: AnalysisRequest, background_tasks: BackgroundT
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow(),
     }
-    
+
     # Run in background
     background_tasks.add_task(run_analysis_background, analysis_id, request.company, request.ticker)
-    
+
     return AnalysisResponse(
         analysis_id=analysis_id,
         company=request.company,
@@ -276,7 +276,7 @@ async def get_analysis_status(analysis_id: str):
     """Get analysis status and results."""
     if analysis_id not in analysis_store:
         raise HTTPException(status_code=404, detail="Analysis not found")
-    
+
     analysis = analysis_store[analysis_id]
     return AnalysisStatusResponse(**analysis)
 
@@ -288,7 +288,7 @@ async def list_reports(limit: int = 50):
     try:
         from database.models import Company, Report
         from sqlalchemy import desc
-        
+
         reports = (
             session.query(Report, Company)
             .join(Company, Report.company_id == Company.id)
@@ -296,7 +296,7 @@ async def list_reports(limit: int = 50):
             .limit(limit)
             .all()
         )
-        
+
         return [
             ReportSummary(
                 report_id=r.id,
@@ -318,7 +318,7 @@ async def get_report(report_id: str):
         report = get_report_by_id(session, report_id)
         if not report:
             raise HTTPException(status_code=404, detail="Report not found")
-        
+
         import json
         return json.loads(report.json_payload)
     finally:

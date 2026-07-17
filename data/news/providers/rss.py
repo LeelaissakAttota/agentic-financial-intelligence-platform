@@ -99,7 +99,7 @@ class RSSProvider(NewsProviderBase):
                         summary=summary[:500],
                         content=None,
                         url=url,
-                        source=self.config.source_type if hasattr(self.config, 'source_type') else NewsSource.GOOGLE_NEWS,
+                        source=self.config.source_type,
                         source_name=self.config.name,
                         published_at=pub_time,
                         author=entry.get('author'),

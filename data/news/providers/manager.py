@@ -260,6 +260,25 @@ class CompositeNewsProvider:
         """Get health status of all providers."""
         return [p.health for p in self.providers]
 
+    def health_check(self) -> dict:
+        """Health check for composite provider."""
+        healthy_count = sum(1 for p in self.providers if p.health.healthy)
+        total_count = len(self.providers)
+        return {
+            "healthy": healthy_count > 0,
+            "providers_healthy": healthy_count,
+            "providers_total": total_count,
+            "provider_details": [
+                {
+                    "name": p.config.name,
+                    "healthy": p.health.healthy,
+                    "success_rate": p.health.success_rate,
+                    "avg_latency_ms": p.health.avg_latency_ms
+                }
+                for p in self.providers
+            ]
+        }
+
     async def start_health_monitoring(self, interval: int = 300):
         """Start background health monitoring."""
         if self._health_check_task is not None:

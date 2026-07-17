@@ -81,6 +81,7 @@ class ProviderConfig:
     max_delay: float = 60.0
     enabled: bool = True
     api_key: Optional[str] = None
+    source_type: NewsSource = NewsSource.GOOGLE_NEWS
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
