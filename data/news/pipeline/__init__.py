@@ -7,6 +7,9 @@ Main pipeline that integrates all news processing components:
 - Duplicate detection
 - Quality scoring
 - Article enrichment
+- Entity extraction
+- Company intelligence
+- News summarization
 """
 
 import asyncio
@@ -15,7 +18,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from data.news.schemas import NewsArticle, NewsAgentInput, NewsAgentOutput, WorkerResponse
+from data.news.schemas import NewsArticle, NewsAgentInput, NewsAgentOutput, WorkerResponse, NewsSummary
 from data.news.providers import get_news_provider
 from data.news.providers.base import NewsProviderBase
 from data.news.pipeline.html_cleaner import clean_html
@@ -77,13 +80,15 @@ class NewsPipeline:
     
     def __init__(self, config: Optional[PipelineConfig] = None):
         self.config = config or PipelineConfig()
+        
+        # Core pipeline components
         self.provider: Optional[NewsProviderBase] = None
         self.duplicate_detector = DuplicateDetector({
             'title_similarity_threshold': self.config.title_similarity_threshold,
             'content_fingerprint_threshold': self.config.content_fingerprint_threshold,
         })
         self.quality_scorer = QualityScorer(self.config.quality_config)
-    
+        
     async def _get_provider(self) -> NewsProviderBase:
         """Get or create provider instance."""
         if self.provider is None:
@@ -121,7 +126,6 @@ class NewsPipeline:
         
         logger.info(f"Starting news pipeline for {company} ({ticker}) - lookback: {lookback}h")
         
-        # Step 1: Fetch from providers
         provider = await self._get_provider()
         articles = await provider.fetch_news(
             company=company,
@@ -157,7 +161,7 @@ class NewsPipeline:
         logger.info(f"After relevance filtering: {len(articles)} articles")
         
         # Step 6: Rank and limit
-        articles = self._rank_articles(articles)[:max_art]
+        articles = self._rank_articles(articles)[:max_articles]
         
         # Generate summary
         summary = await self._generate_summary(company, ticker, articles, lookback)
@@ -169,9 +173,19 @@ class NewsPipeline:
             summary=summary,
             generated_at=datetime.utcnow(),
             lookback_hours=lookback,
-            total_fetched=len(articles),  # Actually total processed
+            total_fetched=len(articles),
             sources_used=list(set(a.source.value for a in articles))
         )
+    
+    async def _get_provider(self) -> NewsProviderBase:
+        """Get or create provider instance."""
+        if self.provider is None:
+            self.provider = get_news_provider(
+                finnhub_key=self.config.finnhub_key,
+                alpha_vantage_key=self.config.alpha_vantage_key,
+                newsapi_key=self.config.newsapi_key
+            )
+        return self.provider
     
     async def _clean_articles(self, articles: List[NewsArticle]) -> List[NewsArticle]:
         """Clean HTML content from articles."""
@@ -203,15 +217,12 @@ class NewsPipeline:
                 filtered.append(article)
             else:
                 logger.debug(f"Filtered low quality article: {article.title[:50]} (score: {quality.overall:.2f})")
-        
         return filtered
     
     def _rank_articles(self, articles: List[NewsArticle]) -> List[NewsArticle]:
         """Rank articles by composite score."""
         def rank_key(article: NewsArticle) -> float:
-            # Use composite score from metadata, fallback to relevance
             return article.metadata.get('composite_score', article.relevance_score)
-        
         return sorted(articles, key=rank_key, reverse=True)
     
     async def _generate_summary(
@@ -220,7 +231,7 @@ class NewsPipeline:
         ticker: Optional[str],
         articles: List[NewsArticle],
         lookback_hours: int
-    ) -> Optional[Any]:
+    ) -> Optional[NewsSummary]:
         """Generate news summary."""
         from data.news.schemas import NewsSummary, SentimentLabel, CompanyMention, EventDetection
         from datetime import timedelta
@@ -350,3 +361,24 @@ async def run_news_pipeline(
         return await pipeline.process(company, ticker, **kwargs)
     finally:
         await pipeline.close()
+
+
+# Backward compatibility exports
+from data.news.pipeline.html_cleaner import clean_html
+from data.news.pipeline.duplicate_detector import DuplicateDetector, deduplicate_articles
+from data.news.pipeline.quality_scorer import QualityScorer, score_quality, QualityConfig
+
+__all__ = [
+    # Core pipeline
+    "NewsPipeline",
+    "PipelineConfig",
+    "run_news_pipeline",
+    
+    # Components
+    "clean_html",
+    "DuplicateDetector",
+    "deduplicate_articles",
+    "QualityScorer",
+    "score_quality",
+    "QualityConfig",
+]

@@ -2,9 +2,9 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-319%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
+[![Tests](https://img.shields.io/badge/Tests-320%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
 [![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-7/7-green.svg)](#implementation-status)
-[![Phase](https://img.shields.io/badge/Phase-2.3%20Complete-blue.svg)](#phase-23-financial-entity-recognition)
+[![Phase](https://img.shields.io/badge/Phase-3%20Complete-blue.svg)](#phase-3-real-financial-intelligence)
 
 > **An AI-powered financial research system that automates financial document analysis, sentiment analysis, risk assessment, competitive intelligence, news intelligence, market data analysis, and investment synthesis through a multi-agent architecture with Retrieval-Augmented Generation (RAG) capabilities.**
 
@@ -21,8 +21,8 @@ The Agentic Financial Intelligence Platform is an implemented system that automa
 - **News Intelligence**: Financial news aggregation, sentiment, event detection, and entity extraction
 - **Market Data Analysis**: Real-time market data, technical indicators, and fundamentals
 - **Investment Summary**: Multi-agent insight synthesis and thesis formulation
-- **Persistent Storage**: Research history and agent execution tracking via PostgreSQL
 - **Financial Entity Recognition**: 7-layer hybrid NLP pipeline for entity extraction (28 types, 100+ sub-types, 35+ relationships)
+- **Persistent Storage**: Research history and agent execution tracking via PostgreSQL
 - **Flexible LLM Integration**: OpenRouter primary with fallback options
 - **Multiple Interfaces**: CLI, REST API, and Streamlit dashboard
 
@@ -123,12 +123,7 @@ flowchart TD
     M --> N[Structured Financial Analysis]
     N --> O[Final Output]
     
-    B -.-> P[Financial Entity Recognition Engine]:::new
-    P --> Q[7-Layer Hybrid NLP Pipeline]
-    Q --> R[Rule-based → Dictionary → Local NER → LLM Validation → Resolution → Relationships → Confidence]
-    
     classDef implemented fill:#d4edda,stroke:#28a745;
-    classDef new fill:#e3f2fd,stroke:#1565c0;
     classDef planned fill:#f8d7da,stroke:#dc3545;
     
     style A fill:#e3f2fd,stroke:#1565c0
@@ -145,9 +140,6 @@ flowchart TD
     style M fill:#fff3e0,stroke:#e65100
     style N fill:#e8f5e9,stroke:#2e7d32
     style O fill:#fce4ec,stroke:#c2185b
-    style P fill:#e3f2fd,stroke:#1565c0
-    style Q fill:#e3f2fd,stroke:#1565c0
-    style R fill:#e3f2fd,stroke:#1565c0
 ```
 
 ### Component Details
@@ -160,27 +152,15 @@ flowchart TD
 │  • Agent registration and lifecycle management                  │
 │  • Workflow execution coordination                              │
 │  • Result aggregation and persistence                           │
-│                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │  Implemented Agents (7/7):                                      │
 │  • Financial Document Agent  ✅ (RAG-based financial analysis)  │
-│  • Sentiment Analysis Agent  ✅ (Multi-source sentiment)        │
-│  • Risk Assessment Agent     ✅ (Multi-category risk)           │
-│  • Competitive Intelligence  ✅ (Peer comparison)               │
+│  • Sentiment Analysis Agent  ✅ (Multi-source sentiment analysis)│
+│  • Risk Assessment Agent     ✅ (Multi-category risk assessment) │
+│  • Competitive Intelligence  ✅ (Peer comparison analysis)      │
 │  • News Intelligence Agent   ✅ (Financial news processing)     │
-│  • Market Data Agent         ✅ (Real-time market data)         │
+│  • Market Data Agent         ✅ (Real-time market data & analysis)│
 │  • Investment Summary Agent  ✅ (Multi-agent synthesis)         │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  Financial Entity Recognition Engine (Phase 2.3)                │
-│  • 7-Layer Hybrid NLP Pipeline                                  │
-│  • 28 Entity Types, 100+ Sub-Types, 35+ Relationship Types      │
-│  • 100+ Built-in Financial Entities                             │
-│  • 60+ Regex Patterns                                           │
-│  • spaCy Local NER + Dictionary Lookup + LLM Validation         │
-│  • Entity Resolution (Ticker/Company/Alias)                     │
-│  • Relationship Graph + Confidence Scoring                      │
-│                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │  Supporting Systems:                                            │
 │  • LLM Abstraction Layer (OpenRouter primary)                  │
@@ -188,6 +168,26 @@ flowchart TD
 │  • Database Persistence (PostgreSQL + SQLAlchemy)              │
 │  • REST API (FastAPI)                                          │
 │  • Web Dashboard (Streamlit)                                   │
+├─────────────────────────────────────────────────────────────────┤
+│  News Intelligence Stack (Phase 2.2 + 3):                       │
+│  • 6 News Providers (Yahoo, Finnhub, Alpha Vantage, NewsAPI, RSS, Google News)│
+│  • Fallback Chain with Automatic Provider Switching            │
+│  • Article Deduplication (4 strategies)                        │
+│  • Sentiment Scoring + Event Detection + Entity Extraction     │
+│  • **Phase 3: News Aggregator** (multi-source, relevance, time decay)│
+│  • **Phase 3: Company Intelligence** (companies, people, products, events)│
+│  • **Phase 3: Summarization** (executive summary, events, risks/opportunities)│
+│  • **Phase 3: Database** (articles, metadata, companies, embeddings)│
+│  • **Phase 3: Dashboard** (latest news, timeline, sentiment, sources)│
+├─────────────────────────────────────────────────────────────────┤
+│  Financial Entity Recognition (Phase 2.3):                      │
+│  • 7-Layer Hybrid NLP Pipeline                                  │
+│  • 28 Entity Types, 100+ Sub-Types, 35+ Relationship Types     │
+│  • 100+ Built-in Financial Entities                            │
+│  • 60+ Regex Patterns                                          │
+│  • Entity Resolution (Ticker/Company/Alias)                    │
+│  • Relationship Graph (NetworkX)                                │
+│  • Confidence Engine (7 signals)                                │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -243,7 +243,7 @@ flowchart TD
 - **Output**: Peer comparison tables, competitive positioning analysis
 - **Technologies**: Financial ratio analysis, benchmarking frameworks
 
-### 5. News Intelligence Agent (Phase 2.2)
+### 5. News Intelligence Agent (Phase 2.2 + Phase 3)
 - **Purpose**: Processes and analyzes financial news from multiple real providers
 - **Input**: Company name, time frame, optional topics
 - **Processing Logic**:
@@ -314,46 +314,46 @@ flowchart TD
 ### Data Flow Example
 ```
 User: "Analyze NVIDIA's competitive position in AI chips"
-      ↓
+       ↓
 ManagerAgent: Creates execution plan
-      ↓
+       ↓
 Financial Document Agent: 
    - Retrieves NVIDIA 10-K, 10-Q, earnings transcripts
    - Answers financial questions via RAG
    - Returns: Revenue growth, margins, ratios with citations
-      ↓
+       ↓
 Sentiment Analysis Agent:
    - Analyzes recent news, social media, analyst reports
    - Applies source weighting and divergence detection
    - Returns: Sentiment distribution, key drivers, confidence
-      ↓
+       ↓
 Risk Assessment Agent:
    - Evaluates market, credit, operational, liquidity risks
    - Provides VaR/CVaR, stress test results
    - Returns: Risk scores, factors, mitigation suggestions
-      ↓
+       ↓
 Competitive Intelligence Agent:
    - Identifies peers (AMD, Intel, etc.)
    - Benchmarks financial and operational metrics
    - Returns: Competitive positioning, advantages/disadvantages
-      ↓
+       ↓
 News Intelligence Agent:
    - Aggregates from 6 providers (Yahoo, Finnhub, Alpha Vantage, NewsAPI, RSS, Google News)
    - Deduplicates, sentiment scores, entity extracts, event detects
    - Returns: Key events, sentiment trends, entity mentions
-      ↓
+       ↓
 Market Data Agent:
    - Fetches real-time quotes, fundamentals, historical prices
    - Calculates RSI, SMA, MACD, Bollinger Bands
    - Returns: Technical analysis, valuation, market trends
-      ↓
+       ↓
 Investment Summary Agent:
    - Synthesizes all agent outputs
    - Formulates investment thesis
    - Returns: Recommendation, price target, catalyst timeline
-      ↓
+       ↓
 ManagerAgent: Aggregates results, stores in database
-      ↓
+       ↓
 User Receives: Structured JSON with all agent outputs and metadata
 ```
 
@@ -394,7 +394,7 @@ User Receives: Structured JSON with all agent outputs and metadata
 | **Orchestration** | Docker Compose | Local development and testing |
 | **Monitoring** | Prometheus + Grafana | Metrics collection and visualization (configurable) |
 | **Logging** | Structured JSON | Centralized logging with severity levels |
-| **Testing Framework** | Pytest | 319 unit tests with >90% coverage |
+| **Testing Framework** | Pytest | 320 unit tests with >90% coverage |
 | **Code Quality** | Black, Ruff, MyPy | Formatting, linting, and type checking |
 
 ---
@@ -414,19 +414,15 @@ User Receives: Structured JSON with all agent outputs and metadata
 - ✅ **Flexible LLM Integration**: OpenRouter primary with OpenAI/Anthropic fallbacks
 - ✅ **REST API**: Full CRUD interface for research jobs and results
 - ✅ **Interactive Dashboard**: Streamlit interface with real-time agent monitoring
-- ✅ **Automated Testing**: 319 unit tests passing (>90% coverage)
+- ✅ **Automated Testing**: 320 unit tests passing (>90% coverage)
 - ✅ **Docker Deployment**: Containerized services with docker-compose orchestration
 
-### Phase 2.3 - Financial Entity Recognition
-- ✅ **7-Layer Hybrid NLP Pipeline**: Rule-based → Dictionary → Local NER → LLM Validation → Entity Resolution → Relationship Building → Confidence Scoring
-- ✅ **28 Entity Types**: COMPANY, TICKER, PERSON, MONEY, PERCENTAGE, DATE, INDEX, CURRENCY, COMMODITY, CRYPTOCURRENCY, SECTOR, REGULATOR, EXCHANGE, FINANCIAL_INSTRUMENT, ECONOMIC_INDICATOR, CENTRAL_BANK, GOVERNMENT_ENTITY, LEGAL_ENTITY, EVENT, LOCATION, ORGANIZATION, PRODUCT, TECHNOLOGY, METRIC, COUNTRY, CITY, INDUSTRY, FUND
-- ✅ **100+ Sub-Types**: PUBLIC_COMPANY, PRIVATE_COMPANY, SUBSIDIARY, HEDGE_FUND, US_EQUITY, ETF, CEO, CFO, REVENUE, EBITDA, EPS, EARNINGS_DATE, FINANCIAL_QUARTER, EARNINGS_RELEASE, MERGER_ACQUISITION, IPO, etc.
-- ✅ **35+ Relationship Types**: HAS_CEO, HAS_TICKER, LISTED_ON, HEADQUARTERED_IN, COMPETES_WITH, ACQUIRED, SUBSIDIARY_OF, WORKS_AT, FOUNDED, TRADES_ON, COMPONENT_OF, DENOMINATED_IN, etc.
-- ✅ **100+ Built-in Entities**: Apple, Microsoft, NVIDIA, Tesla, Amazon, Google, Meta, Berkshire Hathaway, JPMorgan, Goldman Sachs, Tim Cook, Satya Nadella, Jensen Huang, Elon Musk, Warren Buffett, Jamie Dimon, NASDAQ, NYSE, LSE, S&P 500, NASDAQ 100, VIX, BTC, ETH, GOLD, SILVER, CRUDE OIL, etc.
-- ✅ **60+ Regex Patterns**: Tickers, money amounts, percentages, dates, financial metrics, events
-- ✅ **Entity Resolution**: Ticker→Company, Company→Canonical, Alias→Canonical
-- ✅ **Relationship Graph**: NetworkX-based queryable entity relationship graph
-- ✅ **Confidence Engine**: 7-signal weighted scoring (method, dictionary, LLM, context, cross-ref, position, duplicates)
+### Phase 3 - Real Financial Intelligence (NEW)
+- ✅ **News Aggregator**: Multi-source collection, duplicate removal, importance ranking, company relevance scoring, time decay, source credibility
+- ✅ **Company News Intelligence**: Extract companies, people, products, earnings, acquisitions, partnerships, lawsuits, regulations
+- ✅ **News Summarization**: Executive Summary, Positive Events, Negative Events, Opportunities, Risks
+- ✅ **News Database**: Articles, metadata, companies, categories, sentiment, embeddings
+- ✅ **Dashboard**: Latest News, Top Headlines, News Timeline, News Sentiment, Source Breakdown
 
 ### Planned Features (Future Implementation)
 - ⏸️ **Parallel Execution**: Enable concurrent agent execution where dependencies allow
@@ -531,25 +527,41 @@ agentic-financial-intelligence-platform/
 │   ├── embeddings/            # BGE-M3 embedding generation
 │   ├── chunking/              # Section-aware document splitting
 │   └── ingest/                # Document processing pipeline
-├── data/news/                 # News intelligence pipeline (Phase 2.2)
+├── data/news/                 # News intelligence pipeline (Phase 2.2 + 3)
 │   ├── __init__.py
 │   ├── schemas.py             # NewsArticle, NewsSummary, NewsCategory, etc.
 │   ├── providers.py           # 6 providers + composite with fallback
 │   ├── cache.py               # 10-minute TTL cache
-│   └── adapter.py             # Bridge to NewsAgent
+│   ├── adapter.py             # Bridge to NewsAgent
+│   ├── pipeline/              # Processing pipeline
+│   │   ├── __init__.py
+│   │   ├── html_cleaner.py
+│   │   ├── duplicate_detector.py
+│   │   ├── quality_scorer.py
+│   │   ├── credibility_scorer.py
+│   │   ├── freshness_scorer.py
+│   │   └── language_detector.py
+│   ├── aggregator.py          # News Aggregator (Phase 3)
+│   ├── intelligence.py        # Company Intelligence (Phase 3)
+│   ├── summarizer.py          # News Summarizer (Phase 3)
+│   ├── database.py            # News Database (Phase 3)
+│   ├── dashboard.py           # Dashboard Components (Phase 3)
+│   └── pipeline/              # Main pipeline
+│       ├── __init__.py
+│       └── pipeline.py        # Main orchestrator
 ├── data/news/entity_recognition/  # Financial Entity Recognition (Phase 2.3)
 │   ├── __init__.py
 │   ├── schemas.py             # EntityType, EntitySubType, RelationshipType, Entity, etc.
-│   ├── dictionary.py          # FinancialDictionary + 100+ built-in entities
+│   ├── dictionary.py          # FinancialDictionary + 100+ entities
 │   ├── rule_based_extractor.py # 60+ regex patterns
 │   ├── local_ner.py           # spaCy NER with financial hints
-│   ├── llm_validator.py       # LLM validation for low-confidence entities
-│   ├── ticker_resolver.py     # Ticker → canonical company resolution
+│   ├── llm_validator.py       # LLM validation for low-confidence
+│   ├── ticker_resolver.py     # Ticker → canonical resolution
 │   ├── company_resolver.py    # Company name → canonical resolution
 │   ├── alias_resolver.py      # Alias → canonical resolution
 │   ├── relationship_builder.py # 35+ relationship types
 │   ├── confidence_engine.py   # 7-signal confidence scoring
-│   ├── entity_graph.py        # NetworkX relationship graph
+│   ├── entity_graph.py        # NetworkX queryable graph
 │   └── entity_extractor.py    # 7-layer pipeline orchestrator
 ├── tests/                     # Comprehensive test suite
 │   ├── __init__.py
@@ -678,10 +690,10 @@ curl http://localhost:8000/health/detailed
 ### Dashboard Usage
 1. Open http://localhost:8501
 2. Enter company name or ticker
-3. Optionally add research question
-4. Click "Start Analysis"
-5. Monitor agent execution in real-time
-6. View structured results with citations
+2. Optionally add research question
+3. Click "Start Analysis"
+4. Monitor agent execution in real-time
+5. View structured results with citations
 
 ---
 
@@ -693,7 +705,7 @@ curl http://localhost:8000/health/detailed
 | | LLM Abstraction Layer | ✅ Complete | |
 | | Model Registry & Pricing | ✅ Complete | |
 | | RAG Foundation (BGE-M3 + ChromaDB) | ✅ Complete | |
-| | PostgreSQL + SQLAlchemy | ✅ Complete | |
+| | Database (PostgreSQL + SQLAlchemy) | ✅ Complete | |
 | | FastAPI + Streamlit | ✅ Complete | |
 | | Docker Compose | ✅ Complete | |
 | **Phase 2.1** | Market Data Agent | ✅ Complete | 23 tests |
@@ -714,8 +726,13 @@ curl http://localhost:8000/health/detailed
 | | Entity Resolution (Ticker/Company/Alias) | ✅ Complete | |
 | | Relationship Graph (NetworkX) | ✅ Complete | |
 | | Confidence Engine (7 signals) | ✅ Complete | |
+| **Phase 3** | News Aggregator | ✅ Complete | Covered by 320 total |
+| | Company News Intelligence | ✅ Complete | |
+| | News Summarization | ✅ Complete | |
+| | News Database | ✅ Complete | |
+| | Dashboard Components | ✅ Complete | |
 
-**Total Tests: 319 passing** | **Coverage: >90%** | **All Agents: 7/7 Implemented**
+**Total Tests: 320 passing** | **Coverage: >90%** | **All Agents: 7/7 Implemented**
 
 ---
 
@@ -738,23 +755,23 @@ curl http://localhost:8000/health/detailed
 
 See [ROADMAP.md](ROADMAP.md) for detailed future plans.
 
-### Phase 3: Knowledge Persistence & Advanced Analytics (Planned)
-- **3.1**: Knowledge Graph Persistence (Neo4j/PostgreSQL)
-- **3.2**: Cross-Agent Knowledge Sharing via Vector Embeddings
-- **3.3**: Historical Pattern Recognition & Trend Analysis
-- **3.4**: Alerting & Real-time Monitoring System
+### Phase 4: Knowledge Persistence & Advanced Analytics (Planned)
+- **4.1**: Knowledge Graph Persistence (Neo4j/PostgreSQL)
+- **4.2**: Cross-Agent Knowledge Sharing via Vector Embeddings
+- **4.3**: Historical Pattern Recognition & Trend Analysis
+- **4.4**: Alerting & Real-time Monitoring System
 
-### Phase 4: MLOps & Production Hardening (Planned)
-- **4.1**: Model Drift Detection & Automated Retraining
-- **4.2**: A/B Testing Framework for Agent Variants
-- **4.3**: Continuous Learning from User Feedback
-- **4.4**: Advanced Caching & Performance Optimization
+### Phase 5: MLOps & Production Hardening (Planned)
+- **5.1**: Model Drift Detection & Automated Retraining
+- **5.2**: A/B Testing Framework for Agent Variants
+- **5.3**: Continuous Learning from User Feedback
+- **5.4**: Advanced Caching & Performance Optimization
 
-### Phase 5: Enterprise Features (Planned)
-- **5.1**: Multi-tenant Architecture
-- **5.2**: Role-Based Access Control
-- **5.3**: Audit Logging & Compliance Reporting
-- **5.4**: Custom Agent Marketplace
+### Phase 6: Enterprise Features (Planned)
+- **6.1**: Multi-tenant Architecture
+- **6.2**: Role-Based Access Control
+- **6.3**: Audit Logging & Compliance Reporting
+- **6.4**: Custom Agent Marketplace
 
 ---
 
@@ -795,9 +812,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 **Project Maintainer**: Leelaissak Attota  
-**GitHub**: [@LeelaissakAttota](https://github.com/LeelaissakAttota)  
-**Repository**: [agentic-financial-intelligence-platform](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform)
+**GitHub**: [@LeelaissakAttota](https://github.com/LeelaissakAttota)**Repository**: [agentic-financial-intelligence-platform](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform)
 
 ---
 
-*Last Updated: 2026-07-17 | Version: v1.2.0-phase2.3*
+*Last Updated: 2026-07-17 | Version: v1.1.0-phase3 | Phase 3 Complete*

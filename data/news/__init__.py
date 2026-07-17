@@ -95,6 +95,64 @@ from data.news.entity_recognition import (
     Position,
 )
 
+from data.news.aggregator import (
+    NewsAggregator,
+    AggregatorConfig,
+    ArticleEnrichment,
+)
+
+from data.news.intelligence import (
+    CompanyNewsIntelligence,
+    IntelligenceConfig,
+    CompanyIntelligence,
+    ArticleIntelligence,
+    FinancialEventDetector,
+    CompanyResolver,
+    extract_company_intelligence,
+)
+
+from data.news.summarizer import (
+    NewsSummarizer,
+    SummarizationConfig,
+    NewsSummaryResult,
+)
+
+from data.news.database import (
+    NewsArticleModel,
+    CompanyModel,
+    ArticleCompanyLink,
+    NewsSummaryModel,
+    NewsEmbeddingModel,
+    NewsWatchlistModel,
+    upsert_article,
+    upsert_company,
+    link_article_company,
+    get_articles_for_company,
+    get_recent_articles,
+    get_sentiment_trend,
+    get_top_companies_by_mentions,
+    create_news_summary,
+    get_latest_summary,
+)
+
+from data.news.pipeline import (
+    NewsPipeline,
+    PipelineConfig,
+    run_news_pipeline,
+)
+
+from data.news.dashboard import (
+    render_news_dashboard_tab,
+    fetch_news_data,
+    render_latest_news,
+    render_news_timeline,
+    render_news_sentiment,
+    render_source_breakdown,
+    render_related_companies,
+    get_source_credibility,
+    get_source_tier,
+)
+
 __all__ = [
     # Schemas
     "NewsArticle",
@@ -195,4 +253,56 @@ __all__ = [
     "ExtractionConfig",
     "EntityID",
     "Position",
+    
+    # News Aggregator
+    "NewsAggregator",
+    "AggregatorConfig",
+    "ArticleEnrichment",
+    
+    # News Intelligence
+    "CompanyNewsIntelligence",
+    "IntelligenceConfig",
+    "CompanyIntelligence",
+    "ArticleIntelligence",
+    "FinancialEventDetector",
+    "CompanyResolver",
+    "extract_company_intelligence",
+    
+    # News Summarizer
+    "NewsSummarizer",
+    "SummarizationConfig",
+    "NewsSummaryResult",
+    
+    # News Database
+    "NewsArticleModel",
+    "CompanyModel",
+    "ArticleCompanyLink",
+    "NewsSummaryModel",
+    "NewsEmbeddingModel",
+    "NewsWatchlistModel",
+    "upsert_article",
+    "upsert_company",
+    "link_article_company",
+    "get_articles_for_company",
+    "get_recent_articles",
+    "get_sentiment_trend",
+    "get_top_companies_by_mentions",
+    "create_news_summary",
+    "get_latest_summary",
+    
+    # News Pipeline
+    "NewsPipeline",
+    "PipelineConfig",
+    "run_news_pipeline",
+    
+    # News Dashboard
+    "render_news_dashboard_tab",
+    "fetch_news_data",
+    "render_latest_news",
+    "render_news_timeline",
+    "render_news_sentiment",
+    "render_source_breakdown",
+    "render_related_companies",
+    "get_source_credibility",
+    "get_source_tier",
 ]
