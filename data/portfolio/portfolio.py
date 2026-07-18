@@ -5,6 +5,7 @@ Manages portfolio construction, optimization, tracking, and analytics.
 """
 
 import asyncio
+import json
 import logging
 import uuid
 from abc import ABC, abstractmethod
@@ -366,7 +367,6 @@ class PostgresPortfolioBackend(PortfolioBackend):
                 );
                 
                 CREATE INDEX IF NOT EXISTS idx_alerts_portfolio ON alerts(portfolio_id);
-                CREATE INDEX IF NOT EXISTS idx_alerts_triggered ON alerts(triggered);
             """)
     
     async def save_portfolio(self, portfolio: Portfolio) -> None:
@@ -425,7 +425,6 @@ class PostgresPortfolioBackend(PortfolioBackend):
                 owner_id=row["owner_id"],
                 cash=row["cash"],
                 base_currency=row["base_currency"],
-                total_value=row["total_value"],
                 total_cost=row["total_cost"],
                 total_pnl=row["total_pnl"],
                 daily_pnl=row["daily_pnl"],
@@ -438,7 +437,7 @@ class PostgresPortfolioBackend(PortfolioBackend):
             positions_rows = await conn.fetch(
                 "SELECT * FROM positions WHERE portfolio_id = $1", portfolio_id
             )
-            for row in rows:
+            for row in positions_rows:
                 position = Position(
                     id=row["id"],
                     portfolio_id=row["portfolio_id"],

@@ -375,7 +375,7 @@ class PostgresAlertBackend:
                                        channels, channels_config, cooldown_minutes, max_triggers_per_hour,
                                        active_hours_start, active_hours_end, active_days, valid_from, valid_until,
                                        enabled, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                 ON CONFLICT (id) DO UPDATE SET
                     name = EXCLUDED.name,
                     conditions = EXCLUDED.conditions,
@@ -451,7 +451,7 @@ class PostgresAlertBackend:
                                    sent_channels, failed_channels, triggered_at, acknowledged_at,
                                    acknowledged_by, resolved_at, resolved_by, expires_at, metadata)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,
-                        $20, $21, $22, $22, $23, $24, $25)
+                        $20, $21, $22, $23, $24, $25)
                 ON CONFLICT (id) DO UPDATE SET
                     status = EXCLUDED.status,
                     acknowledged_at = EXCLUDED.acknowledged_at,
@@ -574,6 +574,10 @@ class PostgresAlertBackend:
             return dict(stats) if stats else {}
     
     def _row_to_rule(self, row) -> AlertRule:
+        import json
+        conditions = row["conditions"]
+        if isinstance(conditions, str):
+            conditions = json.loads(conditions)
         return AlertRule(
             id=row["id"],
             name=row["name"],
@@ -581,7 +585,7 @@ class PostgresAlertBackend:
             portfolio_id=row["portfolio_id"],
             conditions=[
                 AlertCondition(type=AlertType(c["type"]), symbol=c.get("symbol", ""), parameters=c.get("parameters", {}))
-                for c in row["conditions"]
+                for c in conditions
             ],
             logic=row["logic"],
             severity=AlertSeverity(row["severity"]),

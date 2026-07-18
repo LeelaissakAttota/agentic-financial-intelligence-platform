@@ -26,6 +26,16 @@ The Agentic Financial Intelligence Platform is an **implemented system** that au
 - **Flexible LLM Integration**: OpenRouter primary with fallback options
 - **Multiple Interfaces**: CLI, REST API, and Streamlit dashboard
 
+### Phase 5: Knowledge Intelligence Platform (NEW)
+- **Knowledge Graph**: 14 node types, 28 relationship types, PostgreSQL persistence, graph traversal, centrality analysis, community detection
+- **Portfolio Intelligence**: Position management, order execution, VaR/CVaR, Monte Carlo simulation, 5 rebalancing strategies, sector/geographic allocation
+- **Pattern Detection**: 10 pattern types (trend, seasonal, S/R, reversal, breakout, volume spike, cycle, regime change, anomaly, correlation)
+- **Alert Engine**: 30+ alert types, 5 channels (Email, Slack, Discord, Webhook, In-App), deduplication, cooldown, rate limiting, retry logic
+- **Advanced Analytics**: Fama-French 3/5-factor, Monte Carlo (10K paths), Brinson attribution, scenario analysis, rolling correlation
+- **Historical Intelligence**: Time-series storage, trend analysis (Mann-Kendall, Sen's slope), company evolution tracking, peer comparison
+- **Cross-Agent Memory**: 9 memory types, 5 scopes, supersession, linking, access logging, TTL expiration
+- **Dashboard Extensions**: 5 new tabs (Knowledge Graph, Portfolio, Alerts, Patterns, Analytics) with interactive visualizations
+
 ### Why Financial Research Automation is Valuable
 Financial analysts spend approximately 70% of their time on data collection and only 30% on actual analysis and insight generation. Traditional research workflows involve manual gathering of data from disparate sources (SEC filings, earnings transcripts, news, market data), leading to inefficiencies, inconsistent analysis, and knowledge loss when projects end.
 

@@ -1,6 +1,18 @@
 import pytest
+import os
 from llm.claude_client import ClaudeClient
 
+# Skip this test if no API key is available - requires live credentials
+requires_anthropic_key = pytest.mark.skipif(
+    not any([
+        os.getenv("ANTHROPIC_API_KEY"),
+        os.getenv("CLAUDE_API_KEY"), 
+        os.getenv("OPENROUTER_API_KEY")
+    ]),
+    reason="Requires ANTHROPIC_API_KEY, CLAUDE_API_KEY, or OPENROUTER_API_KEY"
+)
+
+@requires_anthropic_key
 def test_claude_connection():
     """
     Verifies that the ClaudeClient can successfully make a request 

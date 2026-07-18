@@ -1,8 +1,16 @@
 import pytest
+import os
 from config.settings import Settings
 from llm.openrouter_client import OpenRouterClient
 from llm.model_registry import resolve_model, Complexity
 
+# Skip this test if no API key is available - requires live credentials
+requires_openrouter_key = pytest.mark.skipif(
+    not os.getenv("OPENROUTER_API_KEY"),
+    reason="Requires OPENROUTER_API_KEY"
+)
+
+@requires_openrouter_key
 def test_openrouter_connection():
     """
     Integration test to verify OpenRouter connection, JSON parsing and usage tracking.

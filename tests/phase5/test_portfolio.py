@@ -381,10 +381,17 @@ class TestPortfolioManager:
 class TestPortfolioBackend:
     """Test PostgresPortfolioBackend (requires database)."""
 
-    @pytest.mark.skip(reason="Requires PostgreSQL database")
     @pytest.mark.asyncio
     async def test_backend_crud(self):
-        backend = PostgresPortfolioBackend(dsn="postgresql://localhost/test", pool_size=5)
+        import os
+        db_name = os.getenv("POSTGRES_DB", "financial_research_agent")
+        db_user = os.getenv("POSTGRES_USER", "postgres")
+        db_pass = os.getenv("POSTGRES_PASSWORD", "postgres")
+        db_host = os.getenv("POSTGRES_HOST", "localhost")
+        db_port = os.getenv("POSTGRES_PORT", "5432")
+        
+        dsn = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+        backend = PostgresPortfolioBackend(dsn=dsn, pool_size=5)
         await backend.connect()
 
         # Create portfolio

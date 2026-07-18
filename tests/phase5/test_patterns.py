@@ -345,11 +345,18 @@ class TestPatternDetector:
 class TestPatternAnalytics:
     """Test PatternAnalytics."""
     
-    @pytest.mark.skip(reason="Requires database")
     @pytest.mark.asyncio
     async def test_get_pattern_performance(self):
         from data.patterns import PatternAnalytics
-        backend = PostgresPatternBackend(dsn="postgresql://localhost/test", pool_size=5)
+        import os
+        db_name = os.getenv("POSTGRES_DB", "financial_research_agent")
+        db_user = os.getenv("POSTGRES_USER", "postgres")
+        db_pass = os.getenv("POSTGRES_PASSWORD", "postgres")
+        db_host = os.getenv("POSTGRES_HOST", "localhost")
+        db_port = os.getenv("POSTGRES_PORT", "5432")
+        
+        dsn = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+        backend = PostgresPatternBackend(dsn=dsn, pool_size=5)
         await backend.connect()
         
         analytics = PatternAnalytics(backend)
@@ -364,10 +371,17 @@ class TestPatternAnalytics:
 class TestPatternBackend:
     """Test PostgresPatternBackend (requires database)."""
     
-    @pytest.mark.skip(reason="Requires PostgreSQL database")
     @pytest.mark.asyncio
     async def test_save_and_retrieve_pattern(self):
-        backend = PostgresPatternBackend(dsn="postgresql://localhost/test", pool_size=5)
+        import os
+        db_name = os.getenv("POSTGRES_DB", "financial_research_agent")
+        db_user = os.getenv("POSTGRES_USER", "postgres")
+        db_pass = os.getenv("POSTGRES_PASSWORD", "postgres")
+        db_host = os.getenv("POSTGRES_HOST", "localhost")
+        db_port = os.getenv("POSTGRES_PORT", "5432")
+        
+        dsn = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+        backend = PostgresPatternBackend(dsn=dsn, pool_size=5)
         await backend.connect()
         
         pattern = Pattern(
@@ -387,7 +401,7 @@ class TestPatternBackend:
         assert retrieved is not None
         assert retrieved.symbol == "AAPL"
         assert retrieved.pattern_type == PatternType.TREND
-        assert retrieved.confidence_score == 0.85
+        assert retrieved.confidence_score == pytest.approx(0.85)
         
         await backend.delete_pattern(pattern.id)
         await backend.disconnect()

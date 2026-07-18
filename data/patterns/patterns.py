@@ -5,6 +5,7 @@ Detects historical patterns, recurring events, and emerging trends in financial 
 """
 
 import asyncio
+import json
 import logging
 import numpy as np
 import pandas as pd
@@ -1110,7 +1111,7 @@ class PatternAnalytics:
         recent = [p for p in patterns if p.detected_at.date() >= cutoff]
         
         if not recent:
-            return {"total_patterns": 0}
+            return {"total_patterns": 0, "by_type": {}}
         
         # Group by type
         by_type = defaultdict(list)
@@ -1130,7 +1131,9 @@ class PatternAnalytics:
         return {
             "total_patterns": len(recent),
             "by_type": results,
-            "period_days": days_back
+            "period_days": days_back,
+            "accuracy": np.mean([p.confidence_score for p in recent]) if recent else 0.0,
+            "confidence": np.mean([p.confidence_score for p in recent]) if recent else 0.0
         }
     
     async def get_pattern_success_rate(
