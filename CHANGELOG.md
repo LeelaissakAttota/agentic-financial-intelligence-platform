@@ -5,6 +5,91 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0-phase7] - 2026-07-18
+
+### Added - Phase 7: Autonomous Research Workflows
+
+#### Research Planner Agent (`agents/research_planner/agent.py`)
+- **LLM-Driven Query Analysis**: 4 complexity levels (SIMPLE, MODERATE, COMPLEX, COMPREHENSIVE)
+- **Dynamic Agent Selection**: Chooses from 14 agent types based on query requirements
+- **Dependency-Aware Planning**: Automatic topological ordering of execution steps
+- **Parallel Group Identification**: Data collection, analysis_1, analysis_2 parallel groups
+- **Duration Estimation**: Per-agent and total execution time estimates
+- **Priority-Based Ordering**: Critical path agents run first
+
+#### Workflow Orchestrator (`workflows/orchestrator.py`)
+- **Topological Sort Execution**: Resolves dependencies into parallel waves
+- **Bounded Parallelism**: Configurable max concurrency (default 4)
+- **Retry Logic**: Exponential backoff (1m, 5m, 15m) with max retries
+- **Context Propagation**: Shared context passed between dependent steps
+- **Memory Integration**: Automatic storage of agent outputs for cross-agent access
+- **Progress Callbacks**: Real-time execution tracking with step-level granularity
+
+#### Research Memory (`memory/research_memory.py`)
+- **Persistent Sessions**: Complete research context with full audit trail
+- **7 Memory Types**: SESSION, CONCLUSION, SOURCE, AGENT_OUTPUT, FOLLOW_UP, REPORT, INSIGHT
+- **Cross-Session Retrieval**: Company-scoped queries with confidence ordering
+- **Semantic Search Ready**: pgvector-compatible schema for future vector search
+- **Access Tracking**: Count, last accessed, TTL-based expiration
+
+#### Watchlists & Monitoring (`watchlists/manager.py`)
+- **5 Watchlist Types**: PERSONAL, PORTFOLIO, SECTOR, THEMATIC, COMPETITOR
+- **Company Management**: Target prices, stop losses, position sizes, notes, tags
+- **Alert Rules Engine**: 10+ condition types (price, volume, RSI, news sentiment, agent signals)
+- **Cooldown & Rate Limiting**: Per-rule cooldown windows, max triggers per hour
+- **Multi-Channel Notifications**: Email, Slack, Discord, Webhook, In-App, Console
+
+#### Automated Report Generator (`reports/generator.py`)
+- **8 Report Types**: Executive Summary, Analyst Report, Investment Thesis, Company Snapshot, Industry Analysis, Daily/Weekly/Monthly Briefings
+- **3 Output Formats**: Markdown, HTML, JSON
+- **Template System**: Jinja2 with inheritance, auto-generated default templates
+- **Section Builders**: 20+ formatting methods for financial data, risks, recommendations
+- **Source Citation Management**: Automatic source tracking and formatting
+
+#### Human Approval Workflow (`approval/workflow.py`)
+- **6 Action Types**: APPROVE, REJECT, REQUEST_CHANGES, ESCALATE, DELEGATE, COMMENT
+- **Sequential Approval Chains**: Multi-level (Analyst → Senior → Manager)
+- **Escalation Paths**: Auto-add escalated approvers with metadata
+- **Delegation Support**: Transfer approval to another user
+- **Full Audit Trail**: Every action logged with user, timestamp, comment, metadata
+- **Expiration Handling**: Auto-expire with notification
+
+#### Notification Engine (`notifications/engine.py`)
+- **6 Channels**: Email (SMTP/TLS), Slack (webhook/blocks), Discord (webhook/embeds), Webhook (generic), Console, In-App
+- **Retry Logic**: Exponential backoff (1m, 5m, 15m) with max 3 retries
+- **Priority Handling**: LOW/NORMAL/HIGH/CRITICAL with channel filtering
+- **Template System**: Subject/body templates with variable substitution
+- **History Persistence**: Full delivery status tracking in database
+
+#### Research API Endpoints (`api/research_endpoints.py`)
+- **POST /api/v1/research/start** - Start autonomous research (with auto-approve option)
+- **GET /api/v1/research/{id}** - Get research status and results
+- **GET /api/v1/research/history** - Research history with filters
+- **GET /api/v1/research/status** - System status (active executions, capacity)
+- **POST /api/v1/watchlists** - Create watchlist (5 types)
+- **GET /api/v1/watchlists** - List watchlists (owner filter)
+- **POST /api/v1/watchlists/{id}/companies** - Add company to watchlist
+- **DELETE /api/v1/watchlists/{id}/companies/{company}** - Remove company
+- **POST /api/v1/watchlists/{id}/alerts** - Create alert rule
+- **GET /api/v1/approval/{id}** - Get approval request details
+- **POST /api/v1/approval/{id}/action** - Process approval action
+- **GET /api/v1/approval** - List approval requests (user/status filter)
+- **POST /api/v1/reports/generate** - Generate report (8 types, 3 formats)
+- **GET /api/v1/reports** - List generated reports
+
+### Fixed
+- SQLAlchemy reserved word conflicts (`metadata` → `meta`) in 5 models
+- Circular import issues between planner, orchestrator, and agents
+- Missing `TaskResult` class in research planner
+- Database connection context manager implementation
+
+### Changed
+- Updated `requirements.txt` with Phase 7 dependencies
+- Updated `api/main.py` to include research router
+- Bumped version to 1.6.0-phase7
+
+---
+
 ## [1.5.0-phase6] - 2026-07-18
 
 ### Added - Phase 6: Production Hardening
@@ -35,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Cache Abstraction Layer (`cache/manager.py`)
 - **MemoryCache**: LRU with TTL, tag-based invalidation
 - **RedisCache**: Sliding window, sorted sets, distributed
-- **TieredCache**: L1 (Memory) + L2 (Redis) with auto-promotion
+- **TieredCache**: L1 (Memory) + L2 (Redis) with promotion
 - **Decorator**: `@cached(ttl=300, tags=["company"])` with custom key funcs
 
 #### Security & Authentication (`security/auth.py`)
@@ -289,6 +374,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Company resolution with alias mapping and ticker lookup
 - Executive recognition (15+ known CEOs/CFOs)
 - Company intelligence aggregation: mention counts, sentiment tracking, event categorization, source tracking, executive mentions, product mentions
+- Risk/opportunity identification from text and events
+- Key metric extraction (sentiment, event counts, company mentions)
 
 #### News Summarization (`data/news/summarizer.py`)
 - Executive summary generation with multi-factor synthesis
@@ -372,7 +459,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Missing TickerMatch.to_entity() method
 - Non-existent exports: MatchType, CompanyResolution, TickerResolution, AliasResolution, ExtractionPipelineConfig
 - Async initialization bug in entity_extractor.py (get_local_ner_extractor() returns coroutine)
-- ConfidenceFactors.dict() method for serialization
+- ConfidenceFactors.dict() method for serialization compatibility
 
 ---
 
@@ -450,6 +537,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Tag | Date | Phase |
 |---------|-----|------|-------|
+| 1.6.0 | v1.6.0-phase7 | 2026-07-18 | Phase 7: Autonomous Research Workflows |
+| 1.5.0 | v1.5.0-phase6 | 2026-07-18 | Phase 6: Production Hardening |
+| 1.4.0 | v1.4.0-phase5 | 2026-07-18 | Phase 5: Knowledge Intelligence Platform |
 | 1.4.0 | v1.4.0-phase4 | 2026-07-17 | Phase 4: Financial Documents Intelligence |
 | 1.3.0 | v1.3.0-phase3 | 2026-07-17 | Phase 3: Real Financial Intelligence |
 | 1.2.0 | v1.2.0-phase2.3 | 2026-07-17 | Phase 2.3: Financial Entity Recognition |

@@ -38,6 +38,19 @@ from agents.competitor_agent.agent import CompetitorAgent
 from agents.investment_summary_agent.agent import InvestmentSummaryAgent
 from llm.openrouter_client import OpenRouterClient
 
+# New Phase 7 imports
+from agents.research_planner.agent import create_research_plan, ExecutionPlan
+from workflows.orchestrator import execute_research_plan, get_orchestrator
+from memory.research_memory import get_memory_store, ResearchSession
+from reports.generator import generate_report, Report, ReportType, ReportFormat
+from approval.workflow import get_approval_workflow, ApprovalRequest, ApprovalActionType
+from watchlists.manager import get_watchlist_manager, WatchlistData, AlertRuleData
+from notifications.engine import get_notification_engine, NotificationChannel, NotificationPriority
+from config.settings import get_settings
+
+# Import new research router
+from api.research_endpoints import router as research_router
+
 # Monitoring & Middleware
 from monitoring.metrics import (
     get_metrics,
@@ -162,12 +175,15 @@ async def update_system_metrics():
 app = FastAPI(
     title="Financial Research Agent API",
     description="REST API for AI-powered financial research analysis",
-    version="1.4.0",
+    version="1.5.0",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json"
 )
+
+# Include new research routes
+app.include_router(research_router)
 
 # ==================== Middleware Stack (Order Matters!) ====================
 

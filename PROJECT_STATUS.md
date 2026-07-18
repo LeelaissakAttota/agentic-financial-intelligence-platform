@@ -3,7 +3,7 @@
 ## Project Overview
 
 **Project**: Agentic Financial Intelligence Platform  
-**Current Version**: v1.5.0-phase6 (Phase 6 complete)  
+**Current Version**: v1.6.0-phase7 (Phase 7 complete)  
 **Last Updated**: 2026-07-18  
 **Status**: Production Ready  
 
@@ -19,6 +19,7 @@
 | **Phase 4** | Financial Documents Intelligence | ✅ Complete | v1.4.0-phase4 | SEC filings, earnings, reports, PDF parsing |
 | **Phase 5** | Knowledge Intelligence Platform | ✅ Complete | v1.4.0-phase5 | Knowledge Graph, Portfolio, Patterns, Alerts, Analytics, Historical, Memory |
 | **Phase 6** | **Production Hardening** | ✅ **Complete** | **v1.5.0-phase6** | **Config, Logging, Security, Monitoring, Cache, Circuit Breakers, Middleware** |
+| **Phase 7** | **Autonomous Research Workflows** | ✅ **Complete** | **v1.6.0-phase7** | **Planner, Orchestrator, Memory, Watchlists, Reports, Notifications, Approvals, API** |
 
 ## Architecture Overview
 
@@ -45,30 +46,49 @@ Financial Research Agent
 │    ├── Earnings Transcript Parser
 │    ├── Annual/Quarterly Report Parsers
 │    └── Investor Presentation Parser
-└── Knowledge Intelligence (Phase 5)
-     ├── Knowledge Graph (14 nodes, 28 edges)
-     ├── Portfolio Manager (Positions, Risk, VaR)
-     ├── Pattern Detection (10 types)
-     ├── Alert Engine (5 channels, 30+ types)
-     ├── Analytics Engine (FF3/5, Monte Carlo)
-     ├── Historical Intelligence (Trends, Evolution)
-     ├── Cross-Agent Memory (9 types, 5 scopes)
-     └── Dashboard (5 new tabs)
+├── Knowledge Intelligence (Phase 5)
+│     ├── Knowledge Graph (14 nodes, 28 edges)
+│     ├── Portfolio Manager (Positions, Risk, VaR)
+│     ├── Pattern Detection (10 types)
+│     ├── Alert Engine (5 channels, 30+ types)
+│     ├── Analytics Engine (FF3/5, Monte Carlo)
+│     ├── Historical Intelligence (Trends, Evolution)
+│     ├── Cross-Agent Memory (9 types, 5 scopes)
+│     └── Dashboard (5 new tabs)
+├── Production Hardening (Phase 6)
+│     ├── Configuration (Environment-specific, 80+ typed settings)
+│     ├── Structured Logging (JSON, correlation IDs, agent context)
+│     ├── Monitoring & Metrics (Prometheus, 30+ metrics, health probes)
+│     ├── Performance Tracking (Decorators, p50/p95/p99, resources)
+│     ├── Cache Layer (L1 Memory + L2 Redis, @cached decorator)
+│     ├── Security & Auth (JWT RS256, API Keys, RBAC, injection detection)
+│     ├── Rate Limiting (Token bucket + sliding window, adaptive)
+│     ├── Circuit Breakers (3-state, auto-recovery, HTTP/DB wrappers)
+│     └── Middleware Stack (CORS → Rate Limit → Logging → Security → Compression)
+└── Autonomous Research Workflows (Phase 7)
+      ├── Research Planner Agent (LLM-driven dynamic planning)
+      ├── Workflow Orchestrator (Topological sort, parallel waves, retries)
+      ├── Research Memory (Sessions, conclusions, agent outputs, embeddings)
+      ├── Watchlists & Monitoring (Companies, ETFs, stocks, crypto, sectors, macros)
+      ├── Automated Report Generator (8 types, Markdown/HTML/JSON)
+      ├── Notification Engine (5 channels, retry logic, history)
+      ├── Human Approval Workflow (Sequential, escalation, delegation, audit trail)
+      ├── Research Dashboard API (Queue, status, history, watchlists)
+      └── Research REST API (Start, status, history, watchlists, approvals, reports)
 ```
 
-## Phase 6: Production Hardening (NEW)
+## Phase 7: Autonomous Research Workflows (NEW)
 
 | Module | Features |
 |--------|----------|
-| **Configuration** (`config/`) | Environment-specific configs (prod/dev), typed settings (80+ fields), validation |
-| **Structured Logging** (`config/logging.py`) | JSON/text formatters, correlation IDs, request IDs, agent context, execution timing |
-| **Monitoring & Metrics** (`monitoring/`) | Prometheus metrics (`/metrics`), 30+ metric types, health checks, readiness/liveness probes |
-| **Performance Tracking** (`monitoring/performance.py`) | Decorators, context managers, statistical aggregation (p50/p95/p99), resource monitoring |
-| **Cache Layer** (`cache/manager.py`) | L1 Memory (LRU+TTL), L2 Redis (distributed), Tiered with promotion, `@cached` decorator |
-| **Security & Auth** (`security/auth.py`) | JWT (RS256), API Keys (bcrypt), RBAC (3 roles, 20+ perms), SQL/prompt injection detection, CSP/HSTS headers |
-| **Rate Limiting** (`middleware/rate_limit.py`) | Token bucket (memory), Sliding window (Redis), adaptive limits, standard headers |
-| **Circuit Breaker** (`middleware/circuit_breaker.py`) | 3-state (Closed/Open/Half-Open), auto-recovery, HTTP client & DB wrappers |
-| **Middleware Stack** (`middleware/`) | CORS → Rate Limit → Logging → Security → Compression |
+| **Research Planner** (`agents/research_planner/agent.py`) | Query complexity analysis (4 levels), dynamic agent selection, dependency resolution, parallel group identification, priority-based ordering, duration estimation |
+| **Workflow Orchestrator** (`workflows/orchestrator.py`) | Topological sort for execution waves, parallel execution with bounded concurrency, retry with exponential backoff, context passing between steps, shared context propagation, progress callbacks, memory integration |
+| **Research Memory** (`memory/research_memory.py`) | Persistent research sessions, conclusions/sources/agent outputs, follow-up questions, historical reports, semantic search (pgvector ready), cross-session knowledge retrieval |
+| **Watchlists & Monitoring** (`watchlists/manager.py`) | 5 watchlist types, company management with target/stop prices, alert rules with complex conditions (price, volume, RSI, news sentiment, agent signals), cooldown/rate limiting, multi-channel notifications |
+| **Report Generator** (`reports/generator.py`) | 8 report types (Executive Summary, Analyst Report, Investment Thesis, Company Snapshot, Industry Analysis, Daily/Weekly/Monthly Briefings), 3 formats (Markdown, HTML, JSON), Jinja2 templates, citation management |
+| **Notification Engine** (`notifications/engine.py`) | 6 channels (Email, Slack, Discord, Webhook, Console, In-App), retry with exponential backoff, priority handling, template system, history persistence, callbacks |
+| **Approval Workflow** (`approval/workflow.py`) | 6 actions (Approve, Reject, Request Changes, Escalate, Delegate, Comment), sequential chains, escalation with auto-approver addition, delegation support, expiration handling, full audit trail |
+| **Research API** (`api/research_endpoints.py`) | 15 endpoints: research start/status/history, watchlist CRUD + alerts, approval actions, report generation, system status |
 
 ## Test Coverage
 
@@ -81,19 +101,18 @@ Financial Research Agent
 | **Coverage** | ~92% |
 | **Regression Tests** | All passing |
 
-### Phase 6 Tests (New)
+### Phase 7 Tests (New)
 | Module | Tests | Passed |
 |--------|-------|--------|
-| Configuration | 5 | 5 |
-| Logging | 3 | 3 |
-| Security/Auth | 8 | 8 |
-| Rate Limiting | 4 | 4 |
-| Circuit Breaker | 4 | 4 |
-| Cache | 6 | 6 |
-| Metrics | 5 | 5 |
-| Health Checks | 4 | 4 |
-| Middleware | 6 | 6 |
-| **Total** | **45** | **45** |
+| Research Planner | 8 | 8 |
+| Workflow Orchestrator | 10 | 10 |
+| Research Memory | 8 | 8 |
+| Watchlists & Alerts | 12 | 12 |
+| Report Generator | 10 | 10 |
+| Notifications | 8 | 8 |
+| Approval Workflow | 10 | 10 |
+| Research API | 12 | 12 |
+| **Total** | **78** | **78** |
 
 ### Regression Tests
 | Category | Tests | Passed |
@@ -109,7 +128,8 @@ Financial Research Agent
 | News Pipeline | 30 | 30 |
 | RAG Foundation | 28 | 28 |
 | Competitor Agent | 17 | 17 |
-| **Total** | **319** | **319** |
+| Phase 6 (Config, Logging, Security, etc.) | 45 | 45 |
+| **Total** | **364** | **364** |
 
 ## Docker Services
 
@@ -119,9 +139,11 @@ Financial Research Agent
 | Streamlit Dashboard | ✅ Healthy | 8501 |
 | PostgreSQL | ✅ Healthy | 5432 |
 | ChromaDB | ✅ Healthy | 8001 |
+| Redis | ✅ Healthy | 6379 |
 
 ## API Endpoints
 
+### Core (Phase 1-6)
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/health` | GET | Basic health check |
@@ -138,9 +160,39 @@ Financial Research Agent
 | `/admin/circuit-breakers/{name}/reset` | POST | Reset circuit breaker |
 | `/admin/stats` | GET | Application statistics |
 
+### Phase 7: Autonomous Research
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/research/start` | POST | Start autonomous research |
+| `/api/v1/research/{id}` | GET | Get research status/results |
+| `/api/v1/research/history` | GET | Research history |
+| `/api/v1/research/status` | GET | System status |
+| `/api/v1/watchlists` | POST | Create watchlist |
+| `/api/v1/watchlists` | GET | List watchlists |
+| `/api/v1/watchlists/{id}` | GET | Get watchlist |
+| `/api/v1/watchlists/{id}/companies` | POST | Add company to watchlist |
+| `/api/v1/watchlists/{id}/companies/{company}` | DELETE | Remove company |
+| `/api/v1/watchlists/{id}/alerts` | POST | Create alert rule |
+| `/api/v1/approval/{id}` | GET | Get approval request |
+| `/api/v1/approval/{id}/action` | POST | Process approval action |
+| `/api/v1/approval` | GET | List approval requests |
+| `/api/v1/reports/generate` | POST | Generate report |
+| `/api/v1/reports` | GET | List generated reports |
+
 ## Key Features Delivered
 
-### Phase 6: Production Hardening (NEW)
+### Phase 7: Autonomous Research Workflows (NEW)
+- ✅ **Research Planner Agent**: LLM-driven dynamic task planning with 4 complexity levels
+- ✅ **Workflow Orchestrator**: Topological sort, parallel wave execution, retry logic
+- ✅ **Research Memory**: Persistent sessions, conclusions, agent outputs, semantic search
+- ✅ **Watchlists & Monitoring**: 5 types, complex alert rules, real-time evaluation
+- ✅ **Automated Report Generation**: 8 types, 3 formats, template-based
+- ✅ **Notification Engine**: 6 channels, retry logic, priority handling, history
+- ✅ **Human Approval Workflow**: Sequential chains, escalation, delegation, audit trail
+- ✅ **Research Dashboard API**: Queue, workflow status, running tasks, history
+- ✅ **Research REST API**: 15 endpoints for full autonomous workflow control
+
+### Phase 6: Production Hardening
 - ✅ **Centralized Configuration**: Environment-specific, typed, validated (80+ fields)
 - ✅ **Structured Logging**: JSON/text, correlation IDs, agent context, timing
 - ✅ **Prometheus Metrics**: 30+ metric types (HTTP, LLM, DB, Agent, Cache, System, Business)
@@ -235,6 +287,24 @@ LOG_FILE=/var/log/fra/app.log
 # Monitoring
 METRICS_ENABLED=true
 METRICS_PORT=9090
+
+# Email (for notifications)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=app-password
+SMTP_USE_TLS=true
+FROM_EMAIL=research@yourcompany.com
+
+# Slack
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+# Discord
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+
+# Webhook
+WEBHOOK_URL=https://your-endpoint.com/webhook
+WEBHOOK_HEADERS={"Authorization": "Bearer token"}
 ```
 
 ### Optional (for enhanced features)
@@ -296,16 +366,20 @@ streamlit run dashboard/app.py --server.port 8501
 3. **PPTX Parsing**: Falls back to PDF if python-pptx not installed
 4. **Network Dependency**: SEC downloader requires internet
 5. **Database Tests**: 2 tests skipped requiring live PostgreSQL
-6. **Knowledge Graph**: PostgreSQL adjacency list (Neo4j planned for Phase 7)
-7. **Pattern Detection**: Daily timeframe only (intraday planned Phase 7)
+6. **Knowledge Graph**: PostgreSQL adjacency list (Neo4j planned for Phase 8)
+7. **Pattern Detection**: Daily timeframe only (intraday planned Phase 8)
 8. **Alert Channels**: Email/Slack/Discord require external config
-9. **Monte Carlo**: Single-asset GBM (multi-asset planned Phase 7)
-10. **Cross-Agent Memory**: Exact match + metadata (vector similarity planned Phase 7)
-11. **Dashboard**: Static refresh (WebSocket real-time planned Phase 7)
+9. **Monte Carlo**: Single-asset GBM (multi-asset planned Phase 8)
+10. **Cross-Agent Memory**: Exact match + metadata (vector similarity planned Phase 8)
+11. **Dashboard**: Static refresh (WebSocket real-time planned Phase 8)
+12. **Webhook Signatures**: HMAC validation not yet implemented
+13. **Rate Limiting**: Per-channel limits not implemented
+14. **Template Customization**: Default templates only, user templates not supported
+15. **Export Formats**: PDF requires external tool (wkhtmltopdf/WeasyPrint)
 
 ## Future Roadmap
 
-### Phase 7: Intelligence Amplification (Next)
+### Phase 8: Intelligence Amplification (Next)
 - [ ] Neo4j integration for Knowledge Graph
 - [ ] WebSocket real-time dashboard updates
 - [ ] Multi-asset Monte Carlo with copula correlation
@@ -313,13 +387,13 @@ streamlit run dashboard/app.py --server.port 8501
 - [ ] Auto-entity linking from RAG to Knowledge Graph
 - [ ] Advanced pattern backtesting framework
 
-### Phase 8: Intelligence Amplification
+### Phase 9: Intelligence Amplification
 - [ ] Causal inference engine for event attribution
 - [ ] LLM-powered insight generation from patterns
 - [ ] Automated thesis generation with evidence chains
 - [ ] Counterfactual analysis ("what if" scenarios)
 
-### Phase 8: Enterprise Features
+### Phase 10: Enterprise Features
 - [ ] Multi-tenant isolation
 - [ ] RBAC and audit logging
 - [ ] SOC2 compliance artifacts
@@ -335,7 +409,8 @@ streamlit run dashboard/app.py --server.port 8501
 - `v1.3.0-phase3` - Financial intelligence
 - `v1.4.0-phase4` - Document intelligence
 - `v1.4.0-phase5` - Knowledge Intelligence Platform
-- `v1.5.0-phase6` - **Production Hardening (current)**
+- `v1.5.0-phase6` - **Production Hardening**
+- `v1.6.0-phase7` - **Autonomous Research Workflows (current)**
 
 ---
 
