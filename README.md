@@ -42,7 +42,9 @@ The Agentic Financial Intelligence Platform transforms financial research from a
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                        SYSTEM ARCHITECTURE                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  User Interfaces:  CLI │ REST API (FastAPI) │ Streamlit Dashboard          │
+│  User Interfaces:  CLI │ REST API (FastAPI) │ Streamlit Dashboard           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Phase 9: Enterprise Knowledge Graph (Neo4j) & Semantic Intelligence       │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Phase 8: AI Copilot Orchestration (Natural Language → Plan → Execute)     │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -56,7 +58,7 @@ The Agentic Financial Intelligence Platform transforms financial research from a
 │  (15 tools), Collaboration Layer (consensus), Decision Engine (6-step),    │
 │  Explainability (evidence/alternatives/risks), Enhanced Memory (5 scopes)  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Data Layer: PostgreSQL (27 tables) │ ChromaDB (Vector) │ Redis (Cache)   │
+│  Data Layer: PostgreSQL (27+ tables) │ ChromaDB (Vector) │ Redis (Cache)  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -188,7 +190,7 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 
 # LLM Provider (OpenRouter)
-OPENROUTER_API_KEY=sk-or-v1-xxxxx
+OPENROUTER_API_KEY=«redacted:sk-...»
 
 # JWT Keys (generate with: openssl genrsa -out private.pem 2048)
 JWT_PRIVATE_KEY_PATH=./keys/private.pem
@@ -234,6 +236,7 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 | PostgreSQL | 5432 | Primary Database |
 | ChromaDB | 8001 | Vector Store |
 | Redis | 6379 | Cache & Sessions |
+| Neo4j | 7474/7687 | Knowledge Graph (optional) |
 
 ---
 
@@ -268,6 +271,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 
 | Version | Date | Description |
 |---------|------|-------------|
+| **v2.0.0-phase9** | 2026-07-18 | **Autonomous Financial Intelligence Platform v2.0** - Neo4j Knowledge Graph, Real-Time Intelligence, Semantic Intelligence, Autonomous Research, Advanced Portfolio, Predictive Intelligence, Enterprise Dashboard v2, Production Event System |
 | v1.7.0-phase8 | 2026-07-18 | AI Copilot & Autonomous Decision Intelligence |
 | v1.6.0-phase7 | 2026-07-18 | Autonomous Research Workflows |
 | v1.5.0-phase6 | 2026-07-18 | Production Hardening |
