@@ -9,6 +9,13 @@ This package contains all data processing modules for the Financial Research Age
 - earnings: Earnings call transcript processing (Phase 4)
 - annual_reports: Annual/quarterly report and presentation parsers (Phase 4)
 - financial_documents: PDF parsing, table extraction, financial statement parsing (Phase 4)
+- portfolio: Portfolio management, orders, positions, risk (Phase 5)
+- patterns: Pattern detection, historical patterns (Phase 5)
+- alerts: Alert engine, notifications (Phase 5)
+- analytics: Advanced analytics, reporting (Phase 5)
+- intelligence: Historical intelligence, trend analysis (Phase 5)
+- memory: Cross-agent memory sharing (Phase 5)
+- knowledge_graph: Knowledge graph persistence (Phase 5)
 """
 
 from data.news import (
@@ -120,6 +127,96 @@ from data.financial_documents import (
     InvestorPresentationParser,
 )
 
+# Phase 5: Knowledge Persistence & Advanced Analytics
+from data.portfolio import (
+    OrderSide,
+    OrderType,
+    OrderStatus,
+    PositionSide,
+    RebalanceStrategy,
+    Order,
+    Position,
+    Portfolio,
+    Transaction,
+    PortfolioSnapshot,
+    PortfolioBackend,
+    PostgresPortfolioBackend,
+    PortfolioManager,
+    AlertManager,
+    create_portfolio_manager,
+)
+
+from data.patterns import (
+    PatternType,
+    PatternConfidence,
+    Pattern,
+    PatternMatch,
+    PatternBackend,
+    PostgresPatternBackend,
+    PatternDetector,
+    PatternAnalytics,
+    create_pattern_detector,
+)
+
+from data.alerts import (
+    AlertSeverity,
+    AlertStatus,
+    AlertType,
+    AlertChannel,
+    AlertCondition,
+    AlertRule,
+    Alert,
+    AlertBackend,
+    PostgresAlertBackend,
+    AlertEvaluator,
+    AlertEngine,
+    create_alert_engine,
+    DEFAULT_ALERT_TEMPLATES,
+)
+
+from data.analytics import (
+    AnalyticsBackend,
+    AnalyticsReport,
+    QuantAnalysis,
+    FactorAnalysis,
+    RiskMetrics,
+    AnalyticsEngine,
+    create_analytics_engine,
+)
+
+from data.intelligence import (
+    IntelligenceBackend,
+    PostgresIntelligenceBackend,
+    HistoricalReport,
+    HistoricalNews,
+    HistoricalFiling,
+    HistoricalSentiment,
+    HistoricalIntelligence,
+    PostgresIntelligenceBackend,
+    create_historical_intelligence,
+)
+
+from data.memory import (
+    MemoryType,
+    MemorySource,
+    MemoryScope,
+    MemoryEntry,
+    MemoryBackend,
+    PostgresMemoryBackend,
+    CrossAgentMemory,
+    create_cross_agent_memory,
+)
+
+from data.knowledge_graph import (
+    NodeType,
+    RelationshipType,
+    GraphNode,
+    GraphEdge,
+    GraphBackend,
+    PostgresGraphBackend,
+    KnowledgeGraph,
+)
+
 __all__ = [
     # News
     "NewsArticle",
@@ -221,11 +318,85 @@ __all__ = [
     "InvestorPresentationParser",
     "FinancialDocumentParserFactory",
     
-    # Annual Reports (duplicate imports for backward compatibility)
-    "AnnualReportParser",
-    "AnnualReportData",
-    "QuarterlyReportParser",
-    "QuarterlyReportData",
-    "InvestorPresentationParser",
-    "InvestorPresentationData",
+    # Phase 5: Portfolio
+    "OrderSide",
+    "OrderType",
+    "OrderStatus",
+    "PositionSide",
+    "RebalanceStrategy",
+    "Order",
+    "Position",
+    "Portfolio",
+    "Transaction",
+    "PortfolioSnapshot",
+    "PortfolioBackend",
+    "PostgresPortfolioBackend",
+    "PortfolioManager",
+    "AlertManager",
+    "create_portfolio_manager",
+    
+    # Phase 5: Patterns
+    "PatternType",
+    "PatternConfidence",
+    "Pattern",
+    "PatternMatch",
+    "PatternBackend",
+    "PostgresPatternBackend",
+    "PatternDetector",
+    "PatternAnalytics",
+    "create_pattern_detector",
+    
+    # Phase 5: Alerts
+    "AlertSeverity",
+    "AlertStatus",
+    "AlertType",
+    "AlertChannel",
+    "AlertCondition",
+    "AlertRule",
+    "Alert",
+    "AlertBackend",
+    "PostgresAlertBackend",
+    "AlertEvaluator",
+    "AlertEngine",
+    "create_alert_engine",
+    "DEFAULT_ALERT_TEMPLATES",
+    
+    # Phase 5: Analytics
+    "AnalyticsBackend",
+    "AnalyticsReport",
+    "QuantAnalysis",
+    "FactorAnalysis",
+    "RiskMetrics",
+    "AnalyticsEngine",
+    "create_analytics_engine",
+    
+    # Phase 5: Intelligence
+    "IntelligenceBackend",
+    "PostgresIntelligenceBackend",
+    "HistoricalReport",
+    "HistoricalNews",
+    "HistoricalFiling",
+    "HistoricalSentiment",
+    "HistoricalIntelligence",
+    "PostgresIntelligenceBackend",
+    "create_historical_intelligence",
+    
+    # Phase 5: Cross-Agent Memory
+    "MemoryType",
+    "MemorySource",
+    "MemoryScope",
+    "MemoryEntry",
+    "MemoryBackend",
+    "PostgresMemoryBackend",
+    "CrossAgentMemory",
+    "create_cross_agent_memory",
+    
+    # Phase 5: Knowledge Graph
+    "NodeType",
+    "RelationshipType",
+    "GraphNode",
+    "GraphEdge",
+    "GraphBackend",
+    "PostgresGraphBackend",
+    "KnowledgeGraph",
 ]

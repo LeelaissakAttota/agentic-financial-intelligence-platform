@@ -5,6 +5,95 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0-phase5] - 2026-07-18
+
+### Added - Phase 5: Knowledge Intelligence Platform
+
+#### Knowledge Graph (`data/knowledge_graph/graph.py`)
+- **Graph Database**: PostgreSQL-backed adjacency list model with recursive CTEs
+- **14 Node Types**: Company, Person, Product, Industry, Sector, Country, Event, Filing, Metric, News, Pattern, Portfolio, Alert
+- **28 Relationship Types**: CEO_OF, CFO_OF, EXECUTIVE_OF, BOARD_MEMBER_OF, OWNS, OWNED_BY, SUBSIDIARY_OF, PARENT_OF, ACQUIRED, ACQUIRED_BY, MERGED_WITH, COMPETES_WITH, PARTNERS_WITH, SUPPLIES, SUPPLIED_BY, CUSTOMER_OF, VENDOR_OF, INVESTS_IN, INVESTED_BY, BELONGS_TO, OPERATES_IN, HEADQUARTERED_IN, INCORPORATED_IN, FILED, REPORTED_IN, CONTAINS, MENTIONS, REFERENCES, HAS_METRIC
+- **Graph Operations**: Traversal (BFS/DFS), shortest path, centrality (degree, betweenness, PageRank), community detection (Louvain), degree distribution
+- **Persistence**: Full CRUD, history, versioning with node/edge properties
+
+#### Portfolio Intelligence (`data/portfolio/portfolio.py`)
+- **Position Management**: Long/short positions, cost basis, market value, realized/unrealized P&L
+- **Order Execution**: Market, limit, stop, stop-limit orders with fill simulation
+- **Transaction History**: Complete audit trail with commissions
+- **Risk Metrics**: VaR (95%/99%), CVaR, volatility, skewness, kurtosis, beta, correlation
+- **Rebalancing Strategies**: Equal weight, risk parity, max Sharpe, min variance, target allocation
+- **Drawdown Analysis**: Max drawdown, duration, recovery time
+- **Monte Carlo**: Geometric Brownian Motion, 10K paths, percentile bands
+- **Sector/Geographic Allocation**: Concentration analysis (HHI), exposure limits
+
+#### Pattern Detection (`data/patterns/patterns.py`) - 10 Pattern Types
+| Pattern | Detection Method |
+|---------|-----------------|
+| Trend | Linear regression + R², MA alignment |
+| Seasonal | FFT-based seasonality detection |
+| Support/Resistance | K-means clustering of price levels |
+| Reversal | Double top/bottom, head & shoulders |
+| Breakout | Volume-confirmed range breakouts |
+| Volume Spike | Volume > Nx average |
+| Cycle | Dominant cycle via FFT |
+| Regime Change | Volatility regime shifts (HMM) |
+| Anomaly | Z-score > 3σ returns |
+| Correlation | Rolling correlation shifts |
+
+#### Alert Engine (`data/alerts/alerts.py`)
+- **30+ Alert Types**: Price, volume, MA cross, RSI, Bollinger, MACD, pattern, earnings, sentiment, portfolio, news
+- **5 Channels**: Email (SMTP), Slack (webhook), Discord (webhook), Custom Webhook, In-App Console
+- **Deduplication**: Hash-based with configurable windows (1h-24h)
+- **Cooldown**: Per-rule cooldown (default 60 min)
+- **Rate Limiting**: Max triggers per hour (default 10)
+- **Retry Logic**: Exponential backoff (3 retries)
+- **Rule Engine**: AND/OR logic, active hours/days, validity windows
+
+#### Analytics Engine (`data/analytics/analytics.py`)
+- **Risk Metrics**: VaR, CVaR, volatility, Sharpe, Sortino, Calmar, max drawdown
+- **Factor Models**: Fama-French 3-factor, 5-factor (with momentum)
+- **Monte Carlo**: Geometric Brownian Motion, 10K paths, percentile bands
+- **Attribution**: Brinson-Hood-Beebower (allocation + selection + interaction)
+- **Scenarios**: Custom shocks (rate, equity, credit, FX, volatility)
+- **Correlation**: Rolling, EWMA, regime-aware
+
+#### Historical Intelligence (`data/intelligence/historical.py`)
+- **Time-Series Storage**: Reports, news, filings, sentiment, risks, market data
+- **Trend Analysis**: Linear, polynomial, Mann-Kendall, Sen's slope
+- **Company Evolution**: Revenue/margin/leverage trajectories, lifecycle stage
+- **Peer Comparison**: Sector/industry benchmarks, percentile rankings
+
+#### Cross-Agent Memory (`data/memory/cross_agent_memory.py`)
+- **9 Memory Types**: Fact, Insight, Risk, Opportunity, Pattern, Alert, Portfolio, Entity, Relationship
+- **5 Scopes**: Global, Company, Sector, Portfolio, User
+- **Supersession**: New memories replace outdated ones
+- **Linking**: Bidirectional memory linking for knowledge graphs
+- **Access Logging**: Full audit trail of reads/writes
+- **Expiration**: TTL-based with renewal on access
+
+#### Dashboard Extensions (`dashboard/components.py`) - 5 New Tabs
+| Tab | Components |
+|-----|------------|
+| Knowledge Graph | Network viz, node/edge explorer, centrality heatmap, community view |
+| Portfolio | Allocation pie, performance chart, risk dashboard, rebalancing panel |
+| Alerts | Active alerts table, rule manager, channel config, history timeline |
+| Patterns | Pattern cards, chart overlay, performance backtest |
+| Analytics | Factor exposure, Monte Carlo fan chart, scenario grid, correlation matrix |
+
+### Fixed
+- Boolean Series index alignment in anomaly detection (`data/patterns/patterns.py`)
+- Rate limit comparison in Alert Engine (`>` → `>=`)
+- Portfolio `total_value` constructor kwarg removed (handled by `__post_init__`)
+- Alert class exports in `data/alerts/__init__.py` and `data/portfolio/__init__.py`
+- Test fixtures updated for new Portfolio constructor signature
+
+### Changed
+- `data/__init__.py` updated with Phase 5 exports
+- `data/analytics/__init__.py` removed non-existent PostgresAnalyticsBackend export
+- All tests updated to match new interfaces
+
+---
+
 ## [1.4.0-phase4] - 2026-07-17
 
 ### Added - Phase 4: Financial Documents Intelligence

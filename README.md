@@ -2,9 +2,9 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-320%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
-[![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-7/7-green.svg)](#implementation-status)
-[![Phase](https://img.shields.io/badge/Phase-4%20Complete-blue.svg)](#phase-4-financial-documents-intelligence)
+[![Tests](https://img.shields.io/badge/Tests-396%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
+[![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-8/8-green.svg)](#implementation-status)
+[![Phase](https://img.shields.io/badge/Phase-5%20Complete-blue.svg)](#phase-5-knowledge-intelligence-platform)
 
 > **An AI-powered financial research system that automates financial document analysis, sentiment analysis, risk assessment, competitive intelligence, news intelligence, market data analysis, and investment synthesis through a multi-agent architecture with Retrieval-Augmented Generation (RAG) capabilities.**
 
@@ -277,6 +277,17 @@ flowchart TD
 - **Output**: Investment recommendation, price target, catalyst timeline
 - **Technologies**: Structured synthesis, weighted scoring
 
+### 8. Knowledge Graph Agent (Phase 5)
+- **Purpose**: Builds and queries knowledge graph of financial entities and relationships
+- **Input**: Company names, tickers, extracted entities from other agents
+- **Processing Logic**:
+  - Creates nodes for companies, people, products, industries, events, filings, metrics
+  - Establishes 28 relationship types (CEO_OF, COMPETES_WITH, ACQUIRED, PARTNERS_WITH, etc.)
+  - Performs graph traversal, shortest path, centrality analysis, community detection
+  - Maintains versioned history of graph changes
+- **Output**: Entity relationships, network centrality, community structures, graph queries
+- **Technologies**: NetworkX, PostgreSQL (adjacency list), recursive CTEs
+
 ---
 
 ## 🔄 Workflow
@@ -414,7 +425,7 @@ User Receives: Structured JSON with all agent outputs and metadata
 - ✅ **Flexible LLM Integration**: OpenRouter primary with OpenAI/Anthropic fallbacks
 - ✅ **REST API**: Full CRUD interface for research jobs and results
 - ✅ **Interactive Dashboard**: Streamlit interface with real-time agent monitoring
-- ✅ **Automated Testing**: 320 unit tests passing (>90% coverage)
+- ✅ **Automated Testing**: 320+ unit tests passing (>90% coverage)
 - ✅ **Docker Deployment**: Containerized services with docker-compose orchestration
 - ✅ **News Aggregator (Phase 3)**: Multi-source collection, duplicate removal, importance ranking, company relevance scoring, time decay, source credibility
 - ✅ **Company News Intelligence (Phase 3)**: Extract companies, people, products, earnings, acquisitions, partnerships, lawsuits, regulations
@@ -435,6 +446,16 @@ User Receives: Structured JSON with all agent outputs and metadata
 - ✅ **Investor Presentations**: Slides, highlights, initiatives, capital allocation
 - ✅ **Full RAG Integration**: Section-aware chunking, vector storage
 
+### Phase 5: Knowledge Intelligence Platform (NEW)
+- ✅ **Knowledge Graph**: 14 node types, 28 relationship types, PostgreSQL persistence, graph traversal, centrality, community detection
+- ✅ **Portfolio Intelligence**: Position management, order execution, VaR/CVaR, Monte Carlo, rebalancing (5 strategies), sector allocation
+- ✅ **Pattern Detection**: 10 pattern types (trend, seasonal, S/R, reversal, breakout, volume spike, cycle, regime change, anomaly, correlation)
+- ✅ **Alert Engine**: 30+ alert types, 5 channels (Email, Slack, Discord, Webhook, Console), deduplication, cooldown, rate limiting, retry logic
+- ✅ **Advanced Analytics**: Fama-French 3/5-factor, Monte Carlo (10K paths), attribution (Brinson), scenario analysis, rolling correlation
+- ✅ **Historical Intelligence**: Time-series storage, trend analysis (Mann-Kendall, Sen's slope), company evolution, peer comparison
+- ✅ **Cross-Agent Memory**: 9 memory types, 5 scopes, supersession, linking, access logging, TTL expiration
+- ✅ **Dashboard Extensions**: 5 new tabs (Knowledge Graph, Portfolio, Alerts, Patterns, Analytics) with visualizations
+
 ### Phase 3 - Real Financial Intelligence
 - ✅ **News Aggregator**: Multi-source collection, duplicate removal, importance ranking, company relevance scoring, time decay, source credibility
 - ✅ **Company News Intelligence**: Extract companies, people, products, earnings, acquisitions, partnerships, lawsuits, regulations
@@ -447,14 +468,11 @@ User Receives: Structured JSON with all agent outputs and metadata
 - ⏸️ **Enhanced Context Passing**: Share relevant outputs between agents
 - ⏸️ **Dynamic Task Planning**: LLM-driven agent sequencing based on query complexity
 - ⏸️ **Advanced RAG**: Cross-agent knowledge sharing via vector embeddings
-- ⏸️ **Knowledge Graph**: Neo4j-based relationship tracking for insights
 - ⏸️ **MLOps Features**: Model drift detection, A/B testing, continuous learning
 - ⏸️ **User Feedback System**: Rating and correction mechanisms for improvement
-- ⏸️ **Knowledge Graph Persistence (Phase 5)**: Neo4j/PostgreSQL graph persistence
-- ⏸️ **Cross-agent Knowledge Sharing (Phase 5)**
-- ⏸️ **Historical Pattern Recognition (Phase 5)**
-- ⏸️ **Real-time Alerting (Phase 5)**
-- ⏸️ **Portfolio-Level Analysis (Phase 5)**
+- ⏸️ **Neo4j Knowledge Graph**: Enhanced graph database for relationship tracking
+- ⏸️ **Real-time Dashboard**: WebSocket updates for live agent monitoring
+- ⏸️ **Multi-asset Monte Carlo**: Correlation modeling with copulas
 
 ---
 
@@ -708,7 +726,8 @@ curl http://localhost:8000/api/v1/analyze/{analysis_id}
 - `v1.1.0-phase2.2` - News pipeline
 - `v1.2.0-phase2.3` - Entity recognition
 - `v1.3.0-phase3` - Financial intelligence
-- `v1.4.0-phase4` - Document intelligence (current)
+- `v1.4.0-phase4` - Document intelligence
+- `v1.4.0-phase5` - Knowledge Intelligence Platform (current)
 
 ---
 
