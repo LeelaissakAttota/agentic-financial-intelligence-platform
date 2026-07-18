@@ -5,6 +5,93 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0-phase8] - 2026-07-18
+
+### Added - Phase 8: AI Copilot & Autonomous Decision Intelligence
+
+#### AI Copilot (`copilot/`)
+- **Natural Language Conversation**: Multi-turn chat with session management, streaming responses, conversation summarization, follow-up question generation
+- **Session Management**: Create, retrieve, archive sessions with context preservation
+- **Intent Classification**: Automatic detection of research, plan, tool, report, watchlist, memory, status, conversational intents
+- **Context Building**: Company extraction, conversation history, active plan tracking
+
+#### Task Planner (`planning/`)
+- **Goal Decomposition**: LLM-driven complexity analysis (4 levels), dynamic agent selection from 14 types
+- **Dependency Graph**: Topological sort for execution waves, parallel group identification (data_collection, analysis_1, analysis_2)
+- **Execution Modes**: Plan-only, auto-execute, interactive, consulting
+- **Cost/Token Estimation**: Per-agent and total estimates with complexity-based scaling
+
+#### Tool Registry (`tools/`)
+- **15 Tools Across 14 Categories**: Financial Documents, Sentiment, Risk, Competitive, News, Market Data, Investment, Knowledge Graph, Portfolio, Patterns, Alerts, Analytics, Historical, Memory
+- **Automatic Tool Selection**: Confidence-based selection with parameter validation
+- **OpenAI-Compatible Schemas**: All tools export OpenAI-compatible function definitions
+- **Execution Tracking**: Duration, tokens, cost, success/failure per execution
+
+#### Agent Collaboration (`collaboration/`)
+- **Coordinator**: Message routing with 10 coordination signals, finding sharing, conflict detection
+- **Delegation Manager**: Capability-based task routing, load balancing, success rate tracking
+- **Consensus Builder**: 5 voting methods (majority, weighted, unanimous, threshold, borda), dissent analysis, minority reports
+- **Knowledge Graph Client**: Entity context, paths, communities, centrality, similarity queries
+- **Knowledge Aggregator**: Company views, thesis context from graph
+
+#### Decision Engine (`decision/`)
+- **6-Step Reasoning**: Evidence Gathering → Hypothesis Formation → Evidence Evaluation → Alternative Consideration → Risk Analysis → Synthesis
+- **Internal vs External**: Chain-of-thought hidden from users, only explanations exposed
+- **Evidence Aggregation**: From 15 tools across 14 categories
+- **Alternative Scenarios**: Bear/Base/Bull with probabilities, drivers, impact summaries
+
+#### Explainability (`explainability/`)
+- **Evidence Collector**: 10 evidence types (documents, news, market data, analyst reports, metrics, indicators, relationships, patterns, models, expert opinions)
+- **7 Explanation Types**: Recommendation, Risk, Sentiment, Pattern, Consensus, Conflict, Trend
+- **Output Structure**: Summary, detailed explanation, alternatives, risk factors, assumptions, citations
+- **Critical Rule**: Internal reasoning NEVER exposed to users
+
+#### LLM Orchestration (`llm/orchestration.py`)
+- **9 Models**: Claude 3.5 Sonnet, Opus, GPT-4o, GPT-4 Turbo, Gemini Pro 1.5, Haiku, GPT-4o-mini, DeepSeek Chat, Mistral 7B
+- **8 Capabilities**: Reasoning, Coding, Creative, Analysis, Summarization, Extraction, Chat, Vision
+- **4 Optimization Goals**: Cost, Latency, Quality, Balanced
+- **Automatic Routing**: Capability matching, cost/latency/quality constraints, health checks, fallback chains
+- **Adaptive Router**: Learns from execution history (success rate, latency, cost, quality)
+
+#### Enhanced Memory (`memory/enhanced.py`)
+- **5 Scopes**: Global, User, Session, Company, Agent
+- **5 Importance Levels**: Critical, High, Medium, Low, Ephemeral
+- **Conversation Memory**: Full history, summarization, topic extraction
+- **User Preferences**: Auto-learned (companies, reports, agents, UI, notifications)
+- **Decision History**: Outcome tracking, accuracy measurement, feedback
+- **Tool Analytics**: Usage, success rates, cost, duration by tool/category
+- **Auto-Pruning**: Importance-based, TTL, access frequency
+
+#### AI Dashboard (`dashboard/copilot.py`)
+- **5 Tabs**: Chat, Workflow, Decisions, Evidence, Tools
+- **Chat Interface**: Streaming conversation, agent status cards
+- **Workflow Visualization**: Execution plan with progress, parallel groups
+- **Decision Confidence**: Gauge, factor breakdown, Bear/Base/Bull scenarios
+- **Evidence Panel**: Source documents with excerpts, risk assessment
+- **Tools Panel**: Available tools with inline parameter forms
+- **Sidebar**: Session management, agent status, token/cost tracking
+
+#### Copilot API (`api/copilot_endpoints.py`)
+- **20+ Endpoints**: Chat, Plan, Execute, Tools, Reports, Watchlists, Approvals, History, Status
+- **Streaming Support**: SSE for chat responses
+- **Full CRUD**: Sessions, Watchlists, Alerts, Approvals, Reports, Tools
+
+#### Database Models (+7 new tables)
+- `copilot_sessions`, `conversations`, `conversation_messages`, `decision_history`, `tool_executions`, `workflow_executions`
+
+### Fixed
+- SQLAlchemy reserved word conflict (`metadata` → `meta`) in ConversationMessage
+- Circular import issues between planner, orchestrator, and agents
+- Missing `TaskResult` class in research planner
+- Database connection context manager implementation
+
+### Changed
+- Updated `requirements.txt` with Phase 8 dependencies
+- Updated `api/main.py` to include copilot router
+- Bumped version to 1.7.0-phase8
+
+---
+
 ## [1.6.0-phase7] - 2026-07-18
 
 ### Added - Phase 7: Autonomous Research Workflows

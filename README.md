@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-396%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
 [![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-8/8-green.svg)](#implementation-status)
-[![Phase](https://img.shields.io/badge/Phase-7%20Complete-blue.svg)](#phase-7-autonomous-research-workflows)
+[![Phase](https://img.shields.io/badge/Phase-8%20Complete-blue.svg)](#phase-8-ai-copilot--autonomous-decision-intelligence)
 
 > **An AI-powered financial research system that automates financial document analysis, sentiment analysis, risk assessment, competitive intelligence, news intelligence, market data analysis, and investment synthesis through a multi-agent architecture with Retrieval-Augmented Generation (RAG) capabilities.**
 
@@ -26,15 +26,19 @@ The Agentic Financial Intelligence Platform is an **implemented system** that au
 - **Flexible LLM Integration**: OpenRouter primary with fallback options
 - **Multiple Interfaces**: CLI, REST API, and Streamlit dashboard
 - **Autonomous Research Workflows**: Dynamic planning, orchestration, and memory
+- **AI Financial Copilot**: Natural language interface with multi-step reasoning, tool selection, and explainable decisions
 
-### Phase 7: Autonomous Research Workflows (NEW)
-- **Research Planner Agent**: LLM-driven dynamic task planning based on query complexity
-- **Workflow Orchestrator**: Topological sort for execution waves, parallel execution with bounded concurrency, retry with exponential backoff
-- **Research Memory**: Persistent sessions, conclusions, agent outputs, cross-session knowledge retrieval, semantic search ready
-- **Watchlists & Monitoring**: Company/ETF tracking, alert rules with complex conditions, multi-channel notifications
-- **Automated Report Generation**: 8 report types (Executive Summary, Analyst Report, Investment Thesis, Company Snapshot, Industry Analysis, Daily/Weekly/Monthly Briefings), Markdown/HTML/JSON export
-- **Human Approval Workflow**: Approve/Reject/Request Changes/Escalate with audit trail
-- **Research Dashboard API**: Research Queue, Workflow Status, Running Tasks, Completed Reports, Agent Activity, Notifications, Watchlists, Research History
+### Phase 8: AI Copilot & Autonomous Decision Intelligence (NEW)
+- **AI Copilot**: Natural language conversation with multi-turn sessions, session management, streaming responses
+- **Task Planner**: LLM-driven goal decomposition, dependency graphs, sequential/parallel execution, cost/token estimation
+- **Tool Registry**: 15 tools across 14 categories with confidence-based selection and parameter validation
+- **Agent Collaboration**: Multi-agent coordination with message routing, finding sharing, conflict detection, 5 consensus methods
+- **Decision Engine**: 6-step reasoning (evidence→hypothesis→evaluation→alternatives→risk→synthesis), internal reasoning hidden
+- **Explainability**: Evidence summaries, Bear/Base/Bull scenarios, risk factors, assumptions - internal reasoning NEVER exposed
+- **LLM Orchestration**: 9 models, 8 capabilities, 4 optimization goals, health checks, fallback chains, adaptive learning
+- **Enhanced Memory**: 5 scopes, 5 importance levels, conversation memory, user preferences, decision history, tool analytics, pruning
+- **AI Dashboard**: 5 tabs (Chat, Workflow, Decisions, Evidence, Tools), agent status, confidence gauges, token/cost tracking
+- **REST API**: 20+ endpoints for chat, planning, execution, tools, reports, watchlists, approvals, history, status
 
 ### Why Financial Research Automation is Valuable
 Financial analysts spend approximately 70% of their time on data collection and only 30% on actual analysis and insight generation. Traditional research workflows involve manual gathering of data from disparate sources (SEC filings, earnings transcripts, news, market data), leading to inefficiencies, inconsistent analysis, and knowledge loss when projects end.
@@ -108,9 +112,9 @@ The Agentic Financial Intelligence Platform addresses these challenges through a
 
 ### ⚡ Delivers Rapid Insights
 - Reduces research time from hours/days to minutes
-- Parallel processing capabilities (planned enhancement)
+- Parallel processing capabilities
 - Responsive API and dashboard interfaces
-- Enables real-time monitoring and alerting (future enhancement)
+- Real-time monitoring and alerting
 
 ---
 
@@ -133,12 +137,21 @@ flowchart TD
     M --> N[Report Generator]:::implemented
     N --> O[Approval Workflow]:::implemented
     O --> P[Notification Engine]:::implemented
-    C --> Q[RAG Knowledge Base]
-    Q --> R[Vector Search (BGE-M3)]
-    R --> S[Re-ranking (BGE-Reranker)]
-    S --> T[Cited Answers with Sources]
-    T --> U[Structured Financial Analysis]
-    U --> V[Final Output]
+    J --> Q[AI Copilot]:::implemented
+    Q --> R[Task Planner]:::implemented
+    Q --> S[Tool Selector]:::implemented
+    Q --> T[Decision Engine]:::implemented
+    Q --> U[Explainability]:::implemented
+    Q --> V[LLM Orchestrator]:::implemented
+    Q --> W[Enhanced Memory]:::implemented
+    Q --> X[AI Dashboard]:::implemented
+    Q --> Y[REST API]:::implemented
+    C --> Z[RAG Knowledge Base]
+    Z --> AA[Vector Search (BGE-M3)]
+    AA --> AB[Re-ranking (BGE-Reranker)]
+    AB --> AC[Cited Answers with Sources]
+    AC --> AD[Structured Financial Analysis]
+    AD --> AE[Final Output]
 
     classDef implemented fill:#d4edda,stroke:#28a745;
     classDef planned fill:#f8d7da,stroke:#dc3545;
@@ -158,12 +171,21 @@ flowchart TD
     style N fill:#fff3e0,stroke:#e65100
     style O fill:#e8f5e9,stroke:#2e7d32
     style P fill:#f3e5f5,stroke:#7b1fa2
-    style Q fill:#f3e5f5,stroke:#7b1fa2
-    style R fill:#fff3e0,stroke:#e65100
-    style S fill:#e8f5e9,stroke:#2e7d32
-    style T fill:#fff3e0,stroke:#e65100
-    style U fill:#e8f5e9,stroke:#2e7d32
-    style V fill:#fce4ec,stroke:#c2185b
+    style Q fill:#fff3e0,stroke:#e65100
+    style R fill:#e8f5e9,stroke:#2e7d32
+    style S fill:#fff3e0,stroke:#e65100
+    style T fill:#e8f5e9,stroke:#2e7d32
+    style U fill:#f3e5f5,stroke:#7b1fa2
+    style V fill:#fff3e0,stroke:#e65100
+    style W fill:#e8f5e9,stroke:#2e7d32
+    style X fill:#fff3e0,stroke:#e65100
+    style Y fill:#f3e5f5,stroke:#7b1fa2
+    style Z fill:#f3e5f5,stroke:#7b1fa2
+    style AA fill:#fff3e0,stroke:#e65100
+    style AB fill:#e8f5e9,stroke:#2e7d32
+    style AC fill:#fff3e0,stroke:#e65100
+    style AD fill:#e8f5e9,stroke:#2e7d32
+    style AE fill:#fce4ec,stroke:#c2185b
 ```
 
 ### Component Details
@@ -215,6 +237,18 @@ flowchart TD
 │  • Human Approval Workflow (6 actions, audit trail)            │
 │  • Research Dashboard API (15 endpoints)                       │
 │  • Notification Engine (6 channels, retry, history)            │
+├─────────────────────────────────────────────────────────────────┤
+│  Phase 8: AI Copilot & Autonomous Decision Intelligence:       │
+│  • AI Copilot (Natural language, multi-turn, streaming)        │
+│  • Task Planner (Goal decomposition, dependencies, cost/token) │
+│  • Tool Registry (15 tools, 14 categories, confidence scoring) │
+│  • Agent Collaboration (Coordination, delegation, consensus)   │
+│  • Decision Engine (6-step reasoning, hidden internal logic)   │
+│  • Explainability (Evidence, alternatives, risks, assumptions) │
+│  • LLM Orchestration (9 models, 4 goals, fallback, adaptive)  │
+│  • Enhanced Memory (5 scopes, importance, pruning, preferences)│
+│  • AI Dashboard (Chat, Workflow, Evidence, Decisions, Tools)   │
+│  • REST API (20+ endpoints for copilot)                        │
 ├─────────────────────────────────────────────────────────────────┤
 │  News Intelligence Stack (Phase 2.2 + 3):                       │
 │  • 6 News Providers (Yahoo, Finnhub, Alpha Vantage, NewsAPI, RSS, Google News)│
@@ -335,6 +369,21 @@ flowchart TD
 - **Output**: Structured execution plan with steps, dependencies, parallel groups
 - **Technologies**: OpenRouter LLM, topological sort, dependency resolution
 
+### 9. AI Copilot Agent (Phase 8) - NEW
+- **Purpose**: Natural language interface for autonomous financial research
+- **Input**: User message, session context, optional company
+- **Processing Logic**:
+  - Multi-turn conversation with session management
+  - Intent classification (research, plan, tool, report, watchlist, memory, status, chat)
+  - Dynamic plan creation via Task Planner
+  - Tool selection via Tool Registry with confidence scoring
+  - Multi-step reasoning via Decision Engine (6 steps)
+  - Explainability generation (evidence, alternatives, risks, assumptions)
+  - LLM routing via Orchestration (9 models, 4 goals)
+  - Memory retrieval via Enhanced Memory (5 scopes)
+- **Output**: Natural language response, execution plans, tool results, reports, explanations
+- **Technologies**: OpenRouter LLM, Streaming, Task Planner, Tool Registry, Decision Engine, Explainability, LLM Orchestration, Enhanced Memory
+
 ---
 
 ## 🔄 Workflow
@@ -378,6 +427,16 @@ flowchart TD
 5. **Reporting**: Report Generator creates formatted output
 6. **Approval**: Optional human approval for final reports
 7. **Delivery**: Reports delivered via configured channels
+
+### Phase 8 AI Copilot Workflow
+1. **Conversation**: User chats naturally with AI Copilot
+2. **Intent Classification**: LLM determines user intent
+3. **Planning**: Task Planner decomposes goal into tasks with dependencies
+3. **Tool Selection**: Tool Registry selects optimal tools with confidence scoring
+4. **Execution**: Decision Engine performs 6-step reasoning
+5. **Collaboration**: Agents coordinate via Collaboration Coordinator
+5. **Explainability**: Evidence, alternatives, risks, assumptions generated
+6. **Delivery**: Response with explanation, no internal reasoning exposed
 
 ### Data Flow Example
 ```
@@ -509,9 +568,9 @@ Delivery: Reports + notifications via configured channels
 - ✅ **Circuit Breakers**: 3-state, auto-recovery, HTTP client & DB wrappers
 - ✅ **Middleware Stack**: CORS → Rate Limit → Logging → Security → Compression
 
-### Phase 7: Autonomous Research Workflows (NEW)
+### Phase 7: Autonomous Research Workflows
 - ✅ **Research Planner Agent**: LLM-driven dynamic planning, 4 complexity levels, 14 agent types
-- ✅ **Workflow Orchestrator**: Topological sort, parallel waves, retry with backoff, context propagation
+- ✅ **Workflow Orchestrator**: Topological sort, parallel wave execution, retry logic
 - ✅ **Research Memory**: Persistent sessions, conclusions, agent outputs, embeddings-ready
 - ✅ **Watchlists & Monitoring**: 5 types, target/stop prices, 10+ alert conditions, cooldown, channels
 - ✅ **Automated Report Generation**: 8 types, Markdown/HTML/JSON, templates, citations
@@ -519,16 +578,17 @@ Delivery: Reports + notifications via configured channels
 - ✅ **Notification Engine**: 6 channels, retry logic, templates, history, callbacks
 - ✅ **Research Dashboard API**: 15 endpoints (research, watchlists, approvals, reports, status)
 
-### Planned Features (Future Implementation)
-- ⏸️ **Parallel Execution**: Enable concurrent agent execution where dependencies allow
-- ⏸️ **Enhanced Context Passing**: Share relevant outputs between agents
-- ⏸️ **Dynamic Task Planning**: LLM-driven agent sequencing based on query complexity
-- ⏸️ **Advanced RAG**: Cross-agent knowledge sharing via vector embeddings
-- ⏸️ **MLOps Features**: Model drift detection, A/B testing, continuous learning
-- ⏸️ **User Feedback System**: Rating and correction mechanisms for improvement
-- ⏸️ **Neo4j Knowledge Graph**: Enhanced graph database for relationship tracking
-- ⏸️ **Real-time Dashboard**: WebSocket updates for live agent monitoring
-- ⏸️ **Multi-asset Monte Carlo**: Correlation modeling with copulas
+### Phase 8: AI Copilot & Autonomous Decision Intelligence (NEW)
+- ✅ **AI Copilot Agent**: Natural language conversation, multi-turn, session management, streaming
+- ✅ **Task Planner**: Goal decomposition, dependency graphs, sequential/parallel, cost/token estimation
+- ✅ **Tool Registry**: 15 tools, 14 categories, confidence scoring, OpenAI-compatible schemas
+- ✅ **Agent Collaboration**: Message routing, finding sharing, conflict detection, 5 consensus methods
+- ✅ **Decision Engine**: 6-step reasoning, hypothesis testing, alternatives, risks, hidden internal logic
+- ✅ **Explainability Engine**: Evidence, Bear/Base/Bull alternatives, risk factors, assumptions
+- ✅ **LLM Orchestration**: 9 models, 8 capabilities, 4 goals, health checks, fallback chains, adaptive learning
+- ✅ **Enhanced Memory**: 5 scopes, 5 importance levels, conversation memory, preferences, pruning
+- ✅ **AI Dashboard**: 5 tabs (Chat, Workflow, Decisions, Evidence, Tools), streaming chat, token/cost tracking
+- ✅ **REST API**: 20+ endpoints for chat, planning, execution, tools, reports, watchlists, approvals
 
 ---
 
@@ -547,144 +607,125 @@ agentic-financial-intelligence-platform/
 ├── agents/                    # AI agent implementations
 │   ├── __init__.py
 │   ├── financial_document_agent/   # ✅ Implemented (RAG-based)
-│   │   ├── agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   └── exceptions.py
 │   ├── sentiment_analysis_agent/   # ✅ Implemented (multi-source)
-│   │   ├── agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   └── exceptions.py
 │   ├── risk_assessment_agent/      # ✅ Implemented (multi-category)
-│   │   ├── agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   └── exceptions.py
 │   ├── competitive_intelligence_agent/ # ✅ Implemented (positioning)
-│   │   ├── agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   └── exceptions.py
 │   ├── news_agent/                # ✅ Implemented (news intelligence)
-│   │   ├── agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   ├── exceptions.py
-│   │   └── news_agent.py
 │   ├── market_data_agent/         # ✅ Implemented (real-time data)
-│   │   ├── market_agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   └── exceptions.py
 │   ├── investment_summary_agent/  # ✅ Implemented (synthesis)
-│   │   ├── agent.py
-│   │   ├── schemas.py
-│   │   ├── prompts.py
-│   │   └── exceptions.py
 │   ├── research_planner/          # ✅ Phase 7: Autonomous planning
 │   │   ├── agent.py
-│   │   └── __init__.py
+│   │   ├── __init__.py
+│   ├── copilot/                   # ✅ Phase 8: AI Copilot
+│   │   ├── agent.py
+│   │   ├── assistant.py
+│   │   ├── conversation.py
+│   │   ├── prompts.py
+│   │   ├── __init__.py
 │   └── manager_agent/             # ✅ Implemented (orchestration)
 │       ├── manager.py
 │       ├── schemas.py
 │       ├── posters.py
 │       └── exceptions.py
-├── workflows/                 # Phase 7: Orchestration engine
-│   ├── orchestrator.py
-│   └── __init__.py
-├── memory/                    # Phase 7: Research memory
-│   ├── research_memory.py
-│   └── __init__.py
-├── watchlists/                # Phase 7: Monitoring
+├── planning/                 # ✅ Phase 8: Task Planning & LLM Routing
+│   ├── agent.py
+│   ├── orchestration.py      # LLM Router, Model Manager, Adaptive Router
+│   ├── __init__.py
+├── tools/                    # ✅ Phase 8: Tool Registry & Execution
+│   ├── registry.py
+│   ├── __init__.py
+├── collaboration/            # ✅ Phase 8: Multi-Agent Coordination
+│   ├── coordinator.py        # Message routing, finding sharing
+│   ├── delegation.py         # Capability-based delegation
+│   ├── consensus.py          # 5 voting methods, analysis
+│   ├── knowledge.py          # KG client, aggregator
+│   ├── __init__.py
+├── decision/                 # ✅ Phase 8: Reasoning Engine
+│   ├── engine.py             # 6-step reasoning, hidden internal logic
+│   ├── __init__.py
+├── explainability/           # ✅ Phase 8: Transparent Explanations
+│   ├── engine.py             # Evidence, alternatives, risks, assumptions
+│   ├── __init__.py
+├── llm/                      # Phase 8: LLM Orchestration
+│   ├── orchestration.py      # 9 models, 4 goals, health checks, AdaptiveRouter
+│   ├── __init__.py
+├── memory/                   # Phase 7 + Phase 8: Memory
+│   ├── research_memory.py    # Phase 7: Research sessions, conclusions
+│   ├── enhanced.py           # Phase 8: Enhanced memory (5 scopes, pruning)
+│   ├── __init__.py
+├── watchlists/               # Phase 7: Monitoring
 │   ├── manager.py
-│   └── __init__.py
-├── reports/                   # Phase 7: Report generation
+│   ├── __init__.py
+├── reports/                  # Phase 7: Report Generation
 │   ├── generator.py
 │   ├── templates.py
-│   └── __init__.py
-├── notifications/             # Phase 7: Notification engine
+│   ├── __init__.py
+├── notifications/            # Phase 7: Notification Engine
 │   ├── engine.py
-│   └── __init__.py
-├── approval/                  # Phase 7: Human approval
+│   ├── __init__.py
+├── approval/                 # Phase 7: Human Approval
 │   ├── workflow.py
-│   └── __init__.py
-├── api/                       # FastAPI application
+│   ├── __init__.py
+├── api/                      # FastAPI Application
 │   ├── main.py
 │   ├── research_endpoints.py  # Phase 7 endpoints
+│   ├── copilot_endpoints.py   # Phase 8 endpoints (20+)
 │   ├── dependencies.py
-│   └── __init__.py
-├── data/                      # Financial data processing
+│   ├── __init__.py
+├── data/                     # Financial data processing
 │   ├── __init__.py
 │   ├── sec/                   # SEC EDGAR integration
-│   │   ├── __init__.py
-│   │   └── downloader.py
 │   ├── filings/               # Filing processing & caching
-│   │   ├── __init__.py
-│   │   ├── cache.py
-│   │   └── incremental.py
 │   ├── earnings/              # Earnings call transcripts
-│   │   ├── __init__.py
-│   │   └── transcript_parser.py
 │   ├── annual_reports/        # Annual/quarterly report parsers
-│   │   ├── __init__.py
-│   │   ├── annual_report_parser.py
-│   │   ├── quarterly_report_parser.py
-│   │   └── investor_presentation_parser.py
-│   ├── earnings/              # Earnings transcripts
-│   │   ├── __init__.py
-│   │   └── transcript_parser.py
+│   ├── financial_documents/   # Core PDF/financial parsing
+│   ├── knowledge_graph/       # Phase 5: Knowledge Graph
+│   ├── portfolio/             # Phase 5: Portfolio Intelligence
+│   ├── patterns/              # Phase 5: Pattern Detection
+│   ├── alerts/                # Phase 5: Alert Engine
+│   ├── analytics/             # Phase 5: Analytics Engine
+│   ├── intelligence/          # Phase 5: Historical Intelligence
+│   ├── memory/                # Phase 5: Cross-Agent Memory
+│   ├── news/                  # Phase 2-3: News Intelligence
 │   └── financial_documents/   # Core PDF/financial parsing
-│       ├── __init__.py
-│       ├── parser.py
-│       ├── tables.py
-│       ├── parsers.py
-│       └── investor_presentation_parser.py
-├── database/                  # SQLAlchemy ORM and persistence
+├── database/                 # SQLAlchemy ORM and persistence
 │   ├── __init__.py
 │   ├── connection.py
-│   └── models.py
-├── rag/                       # RAG pipeline
+│   └── models.py             # +7 new tables (Phase 8)
+├── rag/                      # RAG pipeline
 │   ├── ingestion/
-│   │   ├── pdf_processor.py
-│   │   ├── metadata_extractor.py
-│   │   └── document_loader.py
 │   ├── chunking/
-│   │   └── section_splitter.py
 │   └── vector_store/
-│       └── chroma_store.py
-├── dashboard/                 # Streamlit dashboard
+├── dashboard/                # Streamlit Dashboard
 │   ├── app.py
-│   └── components/
-├── tests/                     # Test suite (396 tests)
+│   ├── components/
+│   └── copilot.py            # Phase 8: AI Dashboard
+├── tests/                    # Test suite (396 tests)
 │   ├── llm/
+│   ├── phase5/
 │   ├── test_*.py
-│   └── phase5/
-├── config/                    # Phase 6: Configuration
+│   └── phase7/
+├── config/                   # Phase 6: Configuration
 │   ├── settings.py
 │   ├── logging.py
 │   ├── production.py
 │   ├── development.py
 │   ├── security.py
 │   └── cache.py
-├── monitoring/                # Phase 6: Observability
+├── monitoring/               # Phase 6: Observability
 │   ├── metrics.py
 │   ├── health.py
 │   └── performance.py
-├── middleware/                # Phase 6: Middleware stack
+├── middleware/               # Phase 6: Middleware Stack
 │   ├── logging_middleware.py
 │   ├── rate_limit.py
 │   └── circuit_breaker.py
-├── security/                  # Phase 6: Security
+├── security/                 # Phase 6: Security
 │   └── auth.py
-├── cache/                     # Phase 6: Cache abstraction
+├── cache/                    # Phase 6: Cache Abstraction
 │   └── manager.py
-├── middleware/                # Phase 6: Middleware
-│   ├── logging_middleware.py
-│   ├── rate_limit.py
-│   └── circuit_breaker.py
-├── docs/                      # Documentation
-├── config/                    # Configuration
+├── docs/                     # Documentation
+├── config/                   # Configuration
 ├── .dockerignore
 └── README.md
 ```
@@ -774,21 +815,27 @@ curl -X POST http://localhost:8000/api/v1/analyze \
 curl http://localhost:8000/api/v1/analyze/{analysis_id}
 ```
 
-### Autonomous Research (Phase 7)
+### AI Copilot (Phase 8)
 ```bash
 # Start autonomous research with auto-approval
-curl -X POST http://localhost:8000/api/v1/research/start \
+curl -X POST http://localhost:8000/api/v1/copilot/chat \
   -H "Content-Type: application/json" \
-  -d '{"company": "NVDA", "query": "full investment thesis", "auto_approve": true}'
+  -d '{"message": "Analyze NVIDIA competitive position", "session_id": "abc123"}'
 
-# Check status
-curl http://localhost:8000/api/v1/research/{research_id}
+# Create session first
+curl -X POST http://localhost:8000/api/v1/copilot/sessions \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "analyst_001", "company": "NVDA"}'
 
-# Get research history
-curl http://localhost:8000/api/v1/research/history?company=NVDA
+# Generate plan
+curl -X POST http://localhost:8000/api/v1/copilot/sessions/{session_id}/plan \
+  -H "Content-Type: application/json" \
+  -d '{"goal": "Full investment thesis for NVDA", "company": "NVDA"}'
 
-# System status
-curl http://localhost:8000/api/v1/research/status
+# Execute plan
+curl -X POST http://localhost:8000/api/v1/copilot/sessions/{session_id}/execute \
+  -H "Content-Type: application/json" \
+  -d '{"plan": {...}, "auto_approve": true}'
 ```
 
 ### Dashboard
@@ -833,30 +880,24 @@ curl http://localhost:8000/api/v1/research/status
 3. **PPTX Parsing**: Falls back to PDF if python-pptx not installed
 4. **Network Dependency**: SEC downloader requires internet
 5. **Database Tests**: 2 tests skipped requiring live PostgreSQL
-6. **Knowledge Graph**: PostgreSQL adjacency list (Neo4j planned for Phase 8)
-7. **Pattern Detection**: Daily timeframe only (intraday planned Phase 8)
+6. **Knowledge Graph**: PostgreSQL adjacency list (Neo4j planned for Phase 9)
+7. **Pattern Detection**: Daily timeframe only (intraday planned Phase 9)
 8. **Alert Channels**: Email/Slack/Discord require external config
-9. **Monte Carlo**: Single-asset GBM (multi-asset planned Phase 8)
-10. **Cross-Agent Memory**: Exact match + metadata (vector similarity planned Phase 8)
-11. **Dashboard**: Static refresh (WebSocket real-time planned Phase 8)
+9. **Monte Carlo**: Single-asset GBM (multi-asset planned Phase 9)
+10. **Cross-Agent Memory**: Exact match + metadata (vector similarity planned Phase 9)
+11. **Dashboard**: Static refresh (WebSocket real-time planned Phase 9)
 
 ---
 
-## 🔮 Next Phase (Phase 8)
+## 🔮 Next Phase (Phase 9)
 
-### Phase 8: Intelligence Amplification (Next)
+### Phase 9: Autonomous Financial Intelligence Platform (Next)
 - [ ] Neo4j integration for Knowledge Graph
 - [ ] WebSocket real-time dashboard updates
 - [ ] Multi-asset Monte Carlo with copula correlation
 - [ ] Vector similarity search in Cross-Agent Memory
 - [ ] Auto-entity linking from RAG to Knowledge Graph
 - [ ] Advanced pattern backtesting framework
-
-### Phase 9: Intelligence Amplification
-- [ ] Causal inference engine for event attribution
-- [ ] LLM-powered insight generation from patterns
-- [ ] Automated thesis generation with evidence chains
-- [ ] Counterfactual analysis ("what if" scenarios)
 
 ### Phase 10: Enterprise Features
 - [ ] Multi-tenant isolation
@@ -877,7 +918,8 @@ curl http://localhost:8000/api/v1/research/status
 - `v1.4.0-phase4` - Document intelligence
 - `v1.4.0-phase5` - Knowledge Intelligence Platform
 - `v1.5.0-phase6` - Production Hardening
-- `v1.6.0-phase7` - **Autonomous Research Workflows (current)**
+- `v1.6.0-phase7` - Autonomous Research Workflows
+- `v1.7.0-phase8` - **AI Copilot & Autonomous Decision Intelligence (current)**
 
 ---
 
@@ -904,7 +946,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 **Project Maintainer**: Leela Issak Attota  
-**GitHub**: [@LeelaissakAttota](https://github.com/LeelaissakAttota)**Repository**: [agentic-financial-intelligence-platform](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform)
+**GitHub**: [@LeelaissakAttota](https://github.com/LeelaissakAttota)  
+**Repository**: [agentic-financial-intelligence-platform](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform)
 
 ---
 

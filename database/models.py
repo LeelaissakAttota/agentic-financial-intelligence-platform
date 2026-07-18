@@ -175,3 +175,112 @@ class Notification(Base):
     retry_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+# Phase 8: AI Copilot Models
+
+class CopilotSession(Base):
+    __tablename__ = "copilot_sessions"
+
+    session_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    company: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, index=True)
+    mode: Mapped[str] = mapped_column(String(32), default="auto_execute")
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    context: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    total_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    total_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    conversation_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    session_id: Mapped[str] = mapped_column(String(36), ForeignKey("copilot_sessions.session_id"), nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    title: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    token_count: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class ConversationMessage(Base):
+    __tablename__ = "conversation_messages"
+
+    message_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("conversations.conversation_id"), nullable=False, index=True)
+    role: Mapped[str] = mapped_column(String(32), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    meta: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    tool_calls: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    tool_call_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class DecisionHistory(Base):
+    __tablename__ = "decision_history"
+
+    decision_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    session_id: Mapped[str] = mapped_column(String(36), ForeignKey("copilot_sessions.session_id"), nullable=False, index=True)
+    conversation_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("conversations.conversation_id"), nullable=True)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    recommendation: Mapped[str] = mapped_column(Text, nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    reasoning: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Internal reasoning (not exposed to users)
+    explanation: Mapped[str] = mapped_column(Text, nullable=False)  # User-facing explanation
+    evidence: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON - sources and facts
+    alternatives: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON - alternative scenarios
+    risk_factors: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    assumptions: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    model_used: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    tokens_used: Mapped[int] = mapped_column(Integer, default=0)
+    cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    latency_ms: Mapped[float] = mapped_column(Float, default=0.0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class ToolExecution(Base):
+    __tablename__ = "tool_executions"
+
+    execution_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    session_id: Mapped[str] = mapped_column(String(36), ForeignKey("copilot_sessions.session_id"), nullable=False, index=True)
+    tool_name: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    category: Mapped[str] = mapped_column(String(32), nullable=False)
+    parameters: Mapped[str] = mapped_column(Text, nullable=False)  # JSON
+    result: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    duration_seconds: Mapped[float] = mapped_column(Float, default=0.0)
+    tokens_used: Mapped[int] = mapped_column(Integer, default=0)
+    cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+
+
+class WorkflowExecution(Base):
+    __tablename__ = "workflow_executions"
+
+    execution_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    session_id: Mapped[str] = mapped_column(String(36), ForeignKey("copilot_sessions.session_id"), nullable=False, index=True)
+    plan_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    company: Mapped[str] = mapped_column(String(128), nullable=False)
+    goal: Mapped[str] = mapped_column(Text, nullable=False)
+    complexity: Mapped[str] = mapped_column(String(32), nullable=False)
+    tasks: Mapped[str] = mapped_column(Text, nullable=False)  # JSON
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    current_step: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    completed_steps: Mapped[int] = mapped_column(Integer, default=0)
+    total_steps: Mapped[int] = mapped_column(Integer, default=0)
+    step_results: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    total_duration_seconds: Mapped[float] = mapped_column(Float, default=0.0)
+    total_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    total_tokens: Mapped[int] = mapped_column(Integer, default=0)

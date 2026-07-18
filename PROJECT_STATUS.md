@@ -3,7 +3,7 @@
 ## Project Overview
 
 **Project**: Agentic Financial Intelligence Platform  
-**Current Version**: v1.6.0-phase7 (Phase 7 complete)  
+**Current Version**: v1.7.0-phase8 (Phase 8 complete)  
 **Last Updated**: 2026-07-18  
 **Status**: Production Ready  
 
@@ -20,6 +20,7 @@
 | **Phase 5** | Knowledge Intelligence Platform | ✅ Complete | v1.4.0-phase5 | Knowledge Graph, Portfolio, Patterns, Alerts, Analytics, Historical, Memory |
 | **Phase 6** | **Production Hardening** | ✅ **Complete** | **v1.5.0-phase6** | **Config, Logging, Security, Monitoring, Cache, Circuit Breakers, Middleware** |
 | **Phase 7** | **Autonomous Research Workflows** | ✅ **Complete** | **v1.6.0-phase7** | **Planner, Orchestrator, Memory, Watchlists, Reports, Notifications, Approvals, API** |
+| **Phase 8** | **AI Copilot & Autonomous Decision Intelligence** | ✅ **Complete** | **v1.7.0-phase8** | **Copilot, Planner, Tools, Collaboration, Decision, Explainability, LLM Orchestration, Memory, Dashboard, API** |
 
 ## Architecture Overview
 
@@ -65,30 +66,43 @@ Financial Research Agent
 │     ├── Rate Limiting (Token bucket + sliding window, adaptive)
 │     ├── Circuit Breakers (3-state, auto-recovery, HTTP/DB wrappers)
 │     └── Middleware Stack (CORS → Rate Limit → Logging → Security → Compression)
-└── Autonomous Research Workflows (Phase 7)
-      ├── Research Planner Agent (LLM-driven dynamic planning)
-      ├── Workflow Orchestrator (Topological sort, parallel waves, retries)
-      ├── Research Memory (Sessions, conclusions, agent outputs, embeddings)
-      ├── Watchlists & Monitoring (Companies, ETFs, stocks, crypto, sectors, macros)
-      ├── Automated Report Generator (8 types, Markdown/HTML/JSON)
-      ├── Notification Engine (5 channels, retry logic, history)
-      ├── Human Approval Workflow (Sequential, escalation, delegation, audit trail)
-      ├── Research Dashboard API (Queue, status, history, watchlists)
-      └── Research REST API (Start, status, history, watchlists, approvals, reports)
+├── Autonomous Research Workflows (Phase 7)
+│      ├── Research Planner Agent (LLM-driven dynamic planning)
+│      ├── Workflow Orchestrator (Topological sort, parallel waves, retries)
+│      ├── Research Memory (Sessions, conclusions, agent outputs, embeddings)
+│      ├── Watchlists & Monitoring (Companies, ETFs, stocks, crypto, sectors, macros)
+│      ├── Automated Report Generator (8 types, Markdown/HTML/JSON)
+│      ├── Notification Engine (5 channels, retry logic, history)
+│      ├── Human Approval Workflow (Sequential, escalation, delegation, audit trail)
+│      ├── Research Dashboard API (Queue, status, history, watchlists)
+│      └── Research REST API (Start, status, history, watchlists, approvals, reports)
+└── AI Copilot & Autonomous Decision Intelligence (Phase 8)
+     ├── AI Copilot (Natural language, multi-turn, streaming)
+     ├── Task Planner (Goal decomposition, dependencies, cost/token)
+     ├── Tool Registry (15 tools, 14 categories, confidence scoring)
+     ├── Agent Collaboration (Coordination, delegation, consensus)
+     ├── Decision Engine (6-step reasoning, hidden internal logic)
+     ├── Explainability (Evidence, alternatives, risks, assumptions)
+     ├── LLM Orchestration (9 models, 4 goals, fallback, adaptive)
+     ├── Enhanced Memory (5 scopes, importance, pruning, preferences)
+     ├── AI Dashboard (Chat, Workflow, Evidence, Decisions, Tools)
+     └── REST API (20+ endpoints for copilot)
 ```
 
-## Phase 7: Autonomous Research Workflows (NEW)
+## Phase 8: AI Copilot & Autonomous Decision Intelligence (NEW)
 
 | Module | Features |
 |--------|----------|
-| **Research Planner** (`agents/research_planner/agent.py`) | Query complexity analysis (4 levels), dynamic agent selection, dependency resolution, parallel group identification, priority-based ordering, duration estimation |
-| **Workflow Orchestrator** (`workflows/orchestrator.py`) | Topological sort for execution waves, parallel execution with bounded concurrency, retry with exponential backoff, context passing between steps, shared context propagation, progress callbacks, memory integration |
-| **Research Memory** (`memory/research_memory.py`) | Persistent research sessions, conclusions/sources/agent outputs, follow-up questions, historical reports, semantic search (pgvector ready), cross-session knowledge retrieval |
-| **Watchlists & Monitoring** (`watchlists/manager.py`) | 5 watchlist types, company management with target/stop prices, alert rules with complex conditions (price, volume, RSI, news sentiment, agent signals), cooldown/rate limiting, multi-channel notifications |
-| **Report Generator** (`reports/generator.py`) | 8 report types (Executive Summary, Analyst Report, Investment Thesis, Company Snapshot, Industry Analysis, Daily/Weekly/Monthly Briefings), 3 formats (Markdown, HTML, JSON), Jinja2 templates, citation management |
-| **Notification Engine** (`notifications/engine.py`) | 6 channels (Email, Slack, Discord, Webhook, Console, In-App), retry with exponential backoff, priority handling, template system, history persistence, callbacks |
-| **Approval Workflow** (`approval/workflow.py`) | 6 actions (Approve, Reject, Request Changes, Escalate, Delegate, Comment), sequential chains, escalation with auto-approver addition, delegation support, expiration handling, full audit trail |
-| **Research API** (`api/research_endpoints.py`) | 15 endpoints: research start/status/history, watchlist CRUD + alerts, approval actions, report generation, system status |
+| **AI Copilot** (`copilot/`) | Natural language conversation, multi-turn sessions, session management, streaming responses, conversation summarization, follow-up question generation |
+| **Task Planner** (`planning/`) | Goal decomposition, dependency graphs, sequential/parallel execution, retry strategies, failure recovery, execution progress, cost/token estimation |
+| **Tool Registry** (`tools/`) | 15 tools across 14 categories, confidence-based selection, parameter validation, OpenAI-compatible schemas |
+| **Agent Collaboration** (`collaboration/`) | Multi-agent coordination, message routing (10 signals), finding sharing, conflict detection/resolution, 5 consensus methods, knowledge graph integration |
+| **Decision Engine** (`decision/`) | 6-step reasoning (evidence→hypothesis→evaluation→alternatives→risk→synthesis), hidden internal reasoning, user-facing explanations only |
+| **Explainability** (`explainability/`) | 10 evidence types, 7 explanation types, Bear/Base/Bull scenarios, risk factors, assumptions - internal reasoning NEVER exposed |
+| **LLM Orchestration** (`llm/`) | 9 models, 8 capabilities, 4 optimization goals, health checks, fallback chains, adaptive learning from history |
+| **Enhanced Memory** (`memory/enhanced.py`) | 5 scopes, 5 importance levels, conversation memory, user preferences, decision history, tool analytics, auto-pruning |
+| **AI Dashboard** (`dashboard/copilot.py`) | 5 tabs (Chat, Workflow, Decisions, Evidence, Tools), agent status, confidence gauges, token/cost tracking |
+| **Copilot API** (`api/copilot_endpoints.py`) | 20+ endpoints: chat, plan, execute, tools, reports, watchlists, approvals, history, status |
 
 ## Test Coverage
 
@@ -101,7 +115,21 @@ Financial Research Agent
 | **Coverage** | ~92% |
 | **Regression Tests** | All passing |
 
-### Phase 7 Tests (New)
+### Phase 8 Tests (New)
+| Module | Tests | Passed |
+|--------|-------|--------|
+| AI Copilot | 12 | 12 |
+| Task Planner | 10 | 10 |
+| Tool Registry | 15 | 15 |
+| Agent Collaboration | 12 | 12 |
+| Decision Engine | 10 | 10 |
+| Explainability | 10 | 10 |
+| LLM Orchestration | 8 | 8 |
+| Enhanced Memory | 10 | 10 |
+| Copilot API | 15 | 15 |
+| **Total** | **112** | **112** |
+
+### Phase 7 Tests (Existing)
 | Module | Tests | Passed |
 |--------|-------|--------|
 | Research Planner | 8 | 8 |
@@ -179,9 +207,38 @@ Financial Research Agent
 | `/api/v1/reports/generate` | POST | Generate report |
 | `/api/v1/reports` | GET | List generated reports |
 
+### Phase 8: AI Copilot
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/copilot/sessions` | POST | Create session |
+| `/api/v1/copilot/sessions/{id}` | GET | Get session |
+| `/api/v1/copilot/sessions/{id}/chat` | POST | Send message (streaming) |
+| `/api/v1/copilot/sessions/{id}/plan` | POST | Create plan |
+| `/api/v1/copilot/sessions/{id}/execute` | POST | Execute plan |
+| `/api/v1/copilot/tools` | GET | List tools |
+| `/api/v1/copilot/tools/execute` | POST | Execute tool |
+| `/api/v1/copilot/reports/generate` | POST | Generate report |
+| `/api/v1/copilot/watchlists` | POST/GET | Watchlist CRUD |
+| `/api/v1/copilot/approval/{id}/action` | POST | Process approval |
+| `/api/v1/copilot/sessions/{id}/history` | GET | Conversation history |
+| `/api/v1/copilot/sessions/{id}/status` | GET | Session status |
+| `/api/v1/copilot/health` | GET | Copilot health check |
+
 ## Key Features Delivered
 
-### Phase 7: Autonomous Research Workflows (NEW)
+### Phase 8: AI Copilot & Autonomous Decision Intelligence (NEW)
+- ✅ **AI Copilot**: Natural language conversation with multi-turn sessions, streaming, summarization
+- ✅ **Task Planner**: LLM-driven goal decomposition, dependency graphs, cost/token estimation
+- ✅ **Tool Registry**: 15 tools, 14 categories, confidence-based selection, OpenAI schemas
+- ✅ **Agent Collaboration**: 10 coordination signals, finding sharing, conflict detection, 5 consensus methods
+- ✅ **Decision Engine**: 6-step reasoning, hidden internal logic, Bear/Base/Bull scenarios
+- ✅ **Explainability**: 10 evidence types, 7 explanation types, Bear/Base/Bull, risks, assumptions
+- ✅ **LLM Orchestration**: 9 models, 8 capabilities, 4 goals, health checks, fallback chains, adaptive learning
+- ✅ **Enhanced Memory**: 5 scopes, 5 importance levels, conversation memory, preferences, pruning
+- ✅ **AI Dashboard**: 5 tabs (Chat, Workflow, Decisions, Evidence, Tools), agent status, token/cost tracking
+- ✅ **Copilot API**: 20+ endpoints for full conversational control
+
+### Phase 7: Autonomous Research Workflows
 - ✅ **Research Planner Agent**: LLM-driven dynamic task planning with 4 complexity levels
 - ✅ **Workflow Orchestrator**: Topological sort, parallel wave execution, retry logic
 - ✅ **Research Memory**: Persistent sessions, conclusions, agent outputs, semantic search
@@ -366,12 +423,12 @@ streamlit run dashboard/app.py --server.port 8501
 3. **PPTX Parsing**: Falls back to PDF if python-pptx not installed
 4. **Network Dependency**: SEC downloader requires internet
 5. **Database Tests**: 2 tests skipped requiring live PostgreSQL
-6. **Knowledge Graph**: PostgreSQL adjacency list (Neo4j planned for Phase 8)
-7. **Pattern Detection**: Daily timeframe only (intraday planned Phase 8)
+6. **Knowledge Graph**: PostgreSQL adjacency list (Neo4j planned for Phase 9)
+7. **Pattern Detection**: Daily timeframe only (intraday planned Phase 9)
 8. **Alert Channels**: Email/Slack/Discord require external config
-9. **Monte Carlo**: Single-asset GBM (multi-asset planned Phase 8)
-10. **Cross-Agent Memory**: Exact match + metadata (vector similarity planned Phase 8)
-11. **Dashboard**: Static refresh (WebSocket real-time planned Phase 8)
+9. **Monte Carlo**: Single-asset GBM (multi-asset planned Phase 9)
+10. **Cross-Agent Memory**: Exact match + metadata (vector similarity planned Phase 9)
+11. **Dashboard**: Static refresh (WebSocket real-time planned Phase 9)
 12. **Webhook Signatures**: HMAC validation not yet implemented
 13. **Rate Limiting**: Per-channel limits not implemented
 14. **Template Customization**: Default templates only, user templates not supported
@@ -379,7 +436,7 @@ streamlit run dashboard/app.py --server.port 8501
 
 ## Future Roadmap
 
-### Phase 8: Intelligence Amplification (Next)
+### Phase 9: Intelligence Amplification (Next)
 - [ ] Neo4j integration for Knowledge Graph
 - [ ] WebSocket real-time dashboard updates
 - [ ] Multi-asset Monte Carlo with copula correlation
@@ -387,13 +444,13 @@ streamlit run dashboard/app.py --server.port 8501
 - [ ] Auto-entity linking from RAG to Knowledge Graph
 - [ ] Advanced pattern backtesting framework
 
-### Phase 9: Intelligence Amplification
+### Phase 10: Intelligence Amplification
 - [ ] Causal inference engine for event attribution
 - [ ] LLM-powered insight generation from patterns
 - [ ] Automated thesis generation with evidence chains
 - [ ] Counterfactual analysis ("what if" scenarios)
 
-### Phase 10: Enterprise Features
+### Phase 11: Enterprise Features
 - [ ] Multi-tenant isolation
 - [ ] RBAC and audit logging
 - [ ] SOC2 compliance artifacts
@@ -410,7 +467,8 @@ streamlit run dashboard/app.py --server.port 8501
 - `v1.4.0-phase4` - Document intelligence
 - `v1.4.0-phase5` - Knowledge Intelligence Platform
 - `v1.5.0-phase6` - **Production Hardening**
-- `v1.6.0-phase7` - **Autonomous Research Workflows (current)**
+- `v1.6.0-phase7` - **Autonomous Research Workflows**
+- `v1.7.0-phase8` - **AI Copilot & Autonomous Decision Intelligence (current)**
 
 ---
 
