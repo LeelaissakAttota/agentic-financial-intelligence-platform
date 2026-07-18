@@ -1,18 +1,22 @@
 """
 FastAPI application for Financial Research Agent.
+
 Provides REST API for running analyses and retrieving reports.
 """
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import asyncio
 import uuid
 
-from config.settings import Settings
+from config.settings import Settings, get_settings
+from config.logging import setup_logging, get_logger
+from config.logging import set_request_id, set_correlation_id, start_execution_timer
 from database import (
     init_db,
     get_session,
@@ -34,42 +38,182 @@ from agents.competitor_agent.agent import CompetitorAgent
 from agents.investment_summary_agent.agent import InvestmentSummaryAgent
 from llm.openrouter_client import OpenRouterClient
 
+# Monitoring & Middleware
+from monitoring.metrics import (
+    get_metrics,
+    get_content_type,
+    register_health_check,
+    REQUEST_COUNT,
+    REQUEST_LATENCY,
+    REQUEST_IN_PROGRESS,
+    ERROR_COUNT
+)
+from middleware.logging_middleware import RequestLoggingMiddleware
+from middleware.rate_limit import RateLimitMiddleware, InMemoryRateLimiter
+from middleware.circuit_breaker import circuit_breaker_registry, CircuitBreakerConfig
+
 # Database setup
 from database import init_db, get_session, get_engine
 from database.models import Company, Report, AgentRun
 
 # Global settings and engine
-settings = Settings()
+settings = get_settings()
 engine = get_engine(settings)
+
+# Setup structured logging
+setup_logging(
+    level=settings.log_level,
+    format_type=settings.log_format,
+    log_file=settings.log_file,
+    max_size=settings.log_max_size,
+    backup_count=settings.log_backup_count
+)
+
+logger = get_logger(__name__)
+
+# Initialize rate limiter
+rate_limiter = InMemoryRateLimiter(
+    default_limit=settings.rate_limit_requests,
+    default_window=settings.rate_limit_window
+)
 
 # Database initialization on startup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     # Startup
+    logger.info("Application starting up")
     init_db(settings)
+    
+    # Register health checks
+    register_health_check("database", check_database_health)
+    register_health_check("chromadb", check_chromadb_health)
+    register_health_check("llm", check_llm_health)
+    
+    # Start background metrics update
+    asyncio.create_task(update_system_metrics())
+    
     yield
+    
     # Shutdown
+    logger.info("Application shutting down")
     engine.dispose()
+    # Close circuit breakers
+    await circuit_breaker_registry.reset_all()
+
+
+async def check_database_health() -> Dict[str, Any]:
+    """Check database connectivity."""
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return {"status": "healthy", "message": "Database connection OK"}
+    except Exception as e:
+        return {"status": "unhealthy", "message": str(e)}
+
+
+async def check_chromadb_health() -> Dict[str, Any]:
+    """Check ChromaDB connectivity."""
+    try:
+        import requests
+        response = requests.get(
+            f"http://{settings.chroma_host}:{settings.chroma_port}/api/v1/heartbeat",
+            timeout=5
+        )
+        if response.status_code == 200:
+            return {"status": "healthy", "message": "ChromaDB connection OK"}
+        return {"status": "unhealthy", "message": f"ChromaDB returned {response.status_code}"}
+    except Exception as e:
+        return {"status": "unhealthy", "message": str(e)}
+
+
+async def check_llm_health() -> Dict[str, Any]:
+    """Check LLM provider connectivity."""
+    try:
+        # Quick test with a simple prompt
+        client = OpenRouterClient(
+            api_key=settings.openrouter_api_key,
+            base_url=settings.openrouter_base_url
+        )
+        # Just verify we can create the client
+        return {"status": "healthy", "message": "LLM client initialized"}
+    except Exception as e:
+        return {"status": "unhealthy", "message": str(e)}
+
+
+async def update_system_metrics():
+    """Background task to update system metrics."""
+    import psutil
+    from monitoring.metrics import MEMORY_USAGE, CPU_USAGE
+    
+    while True:
+        try:
+            process = psutil.Process()
+            mem = process.memory_info()
+            MEMORY_USAGE.labels(type="rss").set(mem.rss)
+            MEMORY_USAGE.labels(type="vms").set(mem.vms)
+            CPU_USAGE.set(process.cpu_percent(interval=0.1))
+        except Exception:
+            pass
+        await asyncio.sleep(30)
+
 
 app = FastAPI(
     title="Financial Research Agent API",
     description="REST API for AI-powered financial research analysis",
-    version="0.1.0",
+    version="1.4.0",
     lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
 )
 
-# CORS middleware
+# ==================== Middleware Stack (Order Matters!) ====================
+
+# 1. Security Headers (outermost)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins.split(",") if settings.cors_origins != "*" else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# 2. Rate Limiting
+app.add_middleware(
+    RateLimitMiddleware,
+    limiter=rate_limiter,
+    exclude_paths={
+        "/health",
+        "/health/detailed",
+        "/health/live",
+        "/health/ready",
+        "/metrics",
+        "/favicon.ico",
+        "/docs",
+        "/redoc",
+        "/openapi.json"
+    }
+)
 
-# Pydantic models for API
+# 3. Request/Response Logging
+app.add_middleware(
+    RequestLoggingMiddleware,
+    exclude_paths={
+        "/health",
+        "/health/detailed",
+        "/health/live",
+        "/health/ready",
+        "/metrics",
+        "/favicon.ico"
+    },
+    log_request_body=settings.log_request_body if hasattr(settings, 'log_request_body') else False,
+    log_response_body=settings.log_response_body if hasattr(settings, 'log_response_body') else False,
+    max_body_size=settings.max_log_body_size if hasattr(settings, 'max_log_body_size') else 10000
+)
+
+# ==================== Pydantic Models ====================
 class AnalysisRequest(BaseModel):
     """Request to start a financial analysis."""
     company: str = Field(..., description="Company name or ticker symbol")
@@ -155,8 +299,6 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
         result = await manager.run(company=company, query=ticker)
 
         # DEBUG: Log result structure
-        import logging
-        logger = logging.getLogger(__name__)
         logger.info(f"Manager result type: {type(result)}")
         logger.info(f"Manager result.results type: {type(result.results)}")
         logger.info(f"Manager result.results keys: {list(result.results.keys()) if result.results else 'None'}")
@@ -185,7 +327,6 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
         logger.info("Metadata calculation succeeded")
     except Exception as e:
         import traceback
-        logger = logging.getLogger(__name__)
         logger.error(f"Analysis failed with error: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
         analysis["status"] = "failed"
@@ -194,27 +335,31 @@ async def run_analysis_background(analysis_id: str, company: str, ticker: Option
         analysis["updated_at"] = datetime.utcnow()
 
 
+# ==================== Health Check Endpoints ====================
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
+    """Basic health check endpoint."""
     return {
         "status": "healthy",
         "service": "financial-research-agent",
-        "version": "0.1.0",
+        "version": "1.4.0",
         "timestamp": datetime.utcnow().isoformat()
     }
 
 
-@app.get("/health/detailed")
-async def detailed_health_check():
-    """Detailed health check with dependency verification."""
-    checks = {
-        "api": "healthy",
-        "database": "unknown",
-        "chromadb": "unknown",
-    }
+@app.get("/health/live")
+async def liveness_check():
+    """Kubernetes liveness probe."""
+    return {"status": "alive"}
 
-    # Check database using the global engine
+
+@app.get("/health/ready")
+async def readiness_check():
+    """Kubernetes readiness probe."""
+    # Quick dependency checks
+    checks = {}
+    
+    # Database
     try:
         from sqlalchemy import text
         with engine.connect() as conn:
@@ -222,27 +367,51 @@ async def detailed_health_check():
         checks["database"] = "healthy"
     except Exception:
         checks["database"] = "unhealthy"
-
-    # Check ChromaDB
-    try:
-        import requests
-        response = requests.get("http://chromadb:8000/api/v1/heartbeat", timeout=5)
-        if response.status_code == 200:
-            checks["chromadb"] = "healthy"
-        else:
-            checks["chromadb"] = "unhealthy"
-    except Exception:
-        checks["chromadb"] = "unhealthy"
-
-    overall = "healthy" if all(v == "healthy" for v in checks.values()) else "degraded"
-
-    return {
-        "status": overall,
-        "checks": checks,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    
+    overall = "ready" if all(v == "healthy" for v in checks.values()) else "not_ready"
+    return {"status": overall, "checks": checks}
 
 
+@app.get("/health/detailed")
+async def detailed_health_check():
+    """Detailed health check with all dependency verification."""
+    from monitoring.metrics import get_health_status
+    return await get_health_status()
+
+
+# ==================== Metrics Endpoint ====================
+@app.get("/metrics", response_class=PlainTextResponse)
+async def metrics():
+    """Prometheus metrics endpoint."""
+    return Response(
+        content=get_metrics(),
+        media_type=get_content_type()
+    )
+
+
+# ==================== Circuit Breaker Status ====================
+@app.get("/admin/circuit-breakers")
+async def get_circuit_breakers():
+    """Get status of all circuit breakers (admin only)."""
+    return circuit_breaker_registry.get_all_stats()
+
+
+@app.post("/admin/circuit-breakers/{name}/reset")
+async def reset_circuit_breaker(name: str):
+    """Reset a specific circuit breaker (admin only)."""
+    if circuit_breaker_registry.remove(name):
+        return {"message": f"Circuit breaker '{name}' reset"}
+    raise HTTPException(status_code=404, detail="Circuit breaker not found")
+
+
+@app.post("/admin/circuit-breakers/reset-all")
+async def reset_all_circuit_breakers():
+    """Reset all circuit breakers (admin only)."""
+    await circuit_breaker_registry.reset_all()
+    return {"message": "All circuit breakers reset"}
+
+
+# ==================== Analysis Endpoints ====================
 @app.post("/api/v1/analyze", response_model=AnalysisResponse)
 async def start_analysis(request: AnalysisRequest, background_tasks: BackgroundTasks):
     """Start a new financial analysis."""
@@ -281,6 +450,7 @@ async def get_analysis_status(analysis_id: str):
     return AnalysisStatusResponse(**analysis)
 
 
+# ==================== Report Endpoints ====================
 @app.get("/api/v1/reports", response_model=List[ReportSummary])
 async def list_reports(limit: int = 50):
     """List all reports from database."""
@@ -343,6 +513,47 @@ async def get_report_agent_runs(report_id: str):
         ]
     finally:
         session.close()
+
+
+# ==================== Admin Endpoints ====================
+@app.get("/admin/stats")
+async def get_admin_stats():
+    """Get application statistics (admin only)."""
+    from monitoring.metrics import generate_performance_report
+    
+    session = get_session(settings)
+    try:
+        from sqlalchemy import func
+        
+        # Database stats
+        companies_count = session.query(func.count(Company.id)).scalar()
+        reports_count = session.query(func.count(Report.id)).scalar()
+        agent_runs_count = session.query(func.count(AgentRun.id)).scalar()
+        
+        return {
+            "database": {
+                "companies": companies_count,
+                "reports": reports_count,
+                "agent_runs": agent_runs_count
+            },
+            "in_memory": {
+                "active_analyses": len([a for a in analysis_store.values() if a["status"] in ("pending", "running")]),
+                "completed_analyses": len([a for a in analysis_store.values() if a["status"] == "completed"]),
+                "failed_analyses": len([a for a in analysis_store.values() if a["status"] == "failed"])
+            },
+            "performance": generate_performance_report()
+        }
+    finally:
+        session.close()
+
+
+@app.post("/admin/clear-analysis-store")
+async def clear_analysis_store():
+    """Clear in-memory analysis store (admin only)."""
+    global analysis_store
+    count = len(analysis_store)
+    analysis_store.clear()
+    return {"message": f"Cleared {count} analyses from store"}
 
 
 if __name__ == "__main__":

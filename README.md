@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-396%20passing-brightgreen.svg)](https://github.com/LeelaissakAttota/agentic-financial-intelligence-platform/actions)
 [![Implemented Agents](https://img.shields.io/badge/Implemented%20Agents-8/8-green.svg)](#implementation-status)
-[![Phase](https://img.shields.io/badge/Phase-5%20Complete-blue.svg)](#phase-5-knowledge-intelligence-platform)
+[![Phase](https://img.shields.io/badge/Phase-6%20Complete-blue.svg)](#phase-6-production-hardening)
 
 > **An AI-powered financial research system that automates financial document analysis, sentiment analysis, risk assessment, competitive intelligence, news intelligence, market data analysis, and investment synthesis through a multi-agent architecture with Retrieval-Augmented Generation (RAG) capabilities.**
 

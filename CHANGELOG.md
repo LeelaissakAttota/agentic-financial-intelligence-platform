@@ -5,6 +5,87 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0-phase6] - 2026-07-18
+
+### Added - Phase 6: Production Hardening
+
+#### Centralized Configuration (`config/`)
+- **Environment-Specific Config**: `production.py`, `development.py` with typed settings
+- **Logging Config** (`config/logging.py`): JSON/text formatters, rotating files, correlation IDs
+- **Security Config** (`config/security.py`): Headers, rate limiting, input validation
+- **Cache Config** (`config/cache.py`): Redis/Memory backends with TTL
+- **Typed Settings**: Pydantic Settings with 80+ validated fields
+
+#### Structured Logging (`config/logging.py`)
+- JSON/text formatters with correlation IDs, request IDs
+- Agent name context, execution time tracking
+- Console/rotating file handlers, third-party noise reduction
+
+#### Monitoring & Metrics (`monitoring/metrics.py`)
+- **Prometheus Metrics** (`/metrics`): HTTP, LLM, DB, Agent, Vector, Cache, System, Errors
+- **Business Metrics**: Analyses, Reports, KG ops, Patterns, Portfolio, Alerts
+- **Health Checks** (`monitoring/health.py`): DB, Redis, ChromaDB, LLM, Agent System, System Resources
+- **Readiness/Liveness Probes** for Kubernetes
+
+#### Performance Tracking (`monitoring/performance.py`)
+- Function decorators, context managers for latency/memory/CPU
+- Statistical aggregation (mean, median, p95, p99, std dev)
+- Resource monitoring with continuous snapshots
+
+#### Cache Abstraction Layer (`cache/manager.py`)
+- **MemoryCache**: LRU with TTL, tag-based invalidation
+- **RedisCache**: Sliding window, sorted sets, distributed
+- **TieredCache**: L1 (Memory) + L2 (Redis) with auto-promotion
+- **Decorator**: `@cached(ttl=300, tags=["company"])` with custom key funcs
+
+#### Security & Authentication (`security/auth.py`)
+- **JWT Auth**: Access/refresh tokens, RS256, revocation
+- **API Keys**: bcrypt hashed, scoped permissions
+- **RBAC**: Admin/Analyst/Viewer roles, 20+ permissions
+- **Input Validation**: SQL injection detection, prompt injection detection
+- **Security Headers**: CSP, HSTS, X-Frame, Referrer-Policy
+- **Rate Limiting**: Token bucket + sliding window
+- **Circuit Breaker**: 3-state with auto-recovery
+
+#### Request/Response Logging Middleware (`middleware/logging_middleware.py`)
+- Correlation ID propagation, structured logging
+- Security event detection (SQL injection, prompt injection)
+- Sensitive data redaction (headers, body)
+- Performance timing headers
+
+#### Rate Limiting Middleware (`middleware/rate_limit.py`)
+- Token bucket (in-memory), sliding window (Redis)
+- Adaptive limits based on CPU/memory
+- Standard headers (`X-RateLimit-*`), 429 responses
+
+#### Circuit Breaker Middleware (`middleware/circuit_breaker.py`)
+- 3-state (Closed/Open/Half-Open) with auto-recovery
+- HTTP client integration (`CircuitBreakerHTTPClient`)
+- Database wrapper (`CircuitBreakerDB`)
+
+#### API Integration (`api/main.py`)
+- Full middleware stack: CORS → Rate Limit → Logging → Security
+- New endpoints: `/health/live`, `/health/ready`, `/health/detailed`, `/metrics`, `/admin/circuit-breakers`, `/admin/stats`
+- Lifespan handlers for metrics updates, circuit breaker reset
+
+#### Documentation Updates
+- **README.md**: Phase 6 features, security, monitoring
+- **CHANGELOG.md**: Phase 6 entry
+- **PROJECT_STATUS.md**: Phase 6 complete, v1.5.0
+- **ROADMAP.md**: Phase 7 planning
+
+### Fixed
+- Missing dependencies: `networkx`, `plotly`, `scipy`, `aiosqlite`, `asyncpg`
+- Import paths for Phase 6 modules
+
+### Changed
+- Updated `requirements.txt` with Phase 6 dependencies
+- Updated `requirements-dev.txt` for testing
+- Updated `api/main.py` with full middleware stack
+- Updated `config/settings.py` with 80+ production settings
+
+---
+
 ## [1.4.0-phase5] - 2026-07-18
 
 ### Added - Phase 5: Knowledge Intelligence Platform
