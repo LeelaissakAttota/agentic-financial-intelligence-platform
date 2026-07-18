@@ -1,0 +1,485 @@
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        CLI[CLI / cURL]
+        SDK[Python SDK<br/>conceptual]
+        UI[Streamlit Dashboard<br/>:8501]
+        WS[WebSocket<br/>future: real-time]
+    end
+
+    subgraph "API Gateway (FastAPI :8000)"
+        CORS[CORSMiddleware<br/>allow_origins=*]
+        RATE[RateLimitMiddleware<br/>Token bucket + Redis sliding window]
+        LOG[LoggingMiddleware<br/>Correlation IDs, PII redaction]
+        SEC[SecurityMiddleware<br/>JWT RS256, API Keys, RBAC]
+        COMP[CompressionMiddleware<br/>Gzip/Brotli]
+    end
+
+    subgraph "Route Layer"
+        RESEARCH[/api/v1/research<br/>POST start, GET status/history]
+        WATCHLISTS[/api/v1/watchlists<br/>CRUD + alerts]
+        APPROVALS[/api/v1/approval<br/>Actions: approve/reject/escalate/delegate]
+        REPORTS[/api/v1/reports<br/>Generate 8 types, 3 formats]
+        COPILOT[/api/v1/copilot<br/>Chat, plan, execute, tools, history]
+        HEALTH[/health<br/>live, ready, detailed, metrics]
+    end
+
+    subgraph "Dependency Injection"
+        AUTH[get_current_user<br/>JWT validation]
+        PERM[require_permission<br/>RBAC check]
+        DB_SESS[get_session<br/>AsyncSession]
+        SETTINGS[get_settings<br/>Typed config]
+    end
+
+    subgraph "Service Layer"
+        MANAGER[ManagerAgent<br/>14 agent registry]
+        ORCHESTRATOR[WorkflowOrchestrator<br/>Topological sort, waves]
+        PLANNER[ResearchPlannerAgent<br/>LLM-driven planning]
+        COPILOT_AGENT[CopilotAgent<br/>Intent → Plan → Execute]
+        TOOL_REGISTRY[ToolRegistry<br/>15 tools, 14 categories]
+        COLLAB[CollaborationCoordinator<br/>10 signals, mailboxes]
+        DECISION[DecisionEngine<br/>6-step reasoning]
+        EXPLAIN[ExplainabilityEngine<br/>Evidence, alternatives, risks]
+        MEMORY[EnhancedMemoryStore<br/>5 scopes, 5 importance]
+        LLM_ROUTER[LLMRouter<br/>9 models, 4 goals, adaptive]
+    end
+
+    subgraph "Agent Layer (14 Agents)"
+        FD[FinancialDocument]
+        SA[SentimentAnalysis]
+        RA[RiskAssessment]
+        CI[CompetitiveIntelligence]
+        NA[NewsAgent]
+        MDA[MarketData]
+        ISA[InvestmentSummary]
+        KGA[KnowledgeGraph]
+        PA[Portfolio]
+        PDA[PatternDetection]
+        AA[Alerts]
+        ANA[Analytics]
+        HIA[HistoricalIntelligence]
+        CAM[CrossAgentMemory]
+    end
+
+    subgraph "Data & Infrastructure"
+        PG[(PostgreSQL<br/>27 tables)]
+        CHROMA[(ChromaDB<br/>5 collections)]
+        REDIS[(Redis<br/>Cache, sessions, ratelimit)]
+        SEC[SEC EDGAR<br/>10 req/s]
+        NEWS_API[6 News Providers<br/>Yahoo, Finnhub, AlphaVantage, NewsAPI, RSS, Google]
+        MARKET_API[Market Data<br/>Yahoo, AlphaVantage, Finnhub]
+        OPENROUTER[OpenRouter<br/>9 models: Claude, GPT, Gemini, DeepSeek, Mistral]
+    end
+
+    subgraph "Background Services"
+        INCREMENTAL[IncrementalUpdater<br/>24h SEC filings]
+        ALERT_ENGINE[AlertEngine<br/>30+ types, 5 channels]
+        METRICS[MetricsCollector<br/>Prometheus exposition]
+        HEALTH[HealthChecker<br/>Liveness/Readiness]
+    end
+
+    %% Request Flow
+    CLI --> CORS
+    SDK --> CORS
+    UI --> CORS
+    WS --> CORS
+
+    CORS --> RATE
+    RATE --> LOG
+    LOG --> SEC
+    SEC --> COMP
+
+    COMP --> RESEARCH
+    COMP --> WATCHLISTS
+    COMP --> APPROVALS
+    COMP --> REPORTS
+    COMP --> COPILOT
+    COMP --> HEALTH
+
+    RESEARCH --> AUTH
+    WATCHLISTS --> AUTH
+    APPROVALS --> AUTH
+    REPORTS --> AUTH
+    COPILOT --> AUTH
+    HEALTH -.-> AUTH
+
+    RESEARCH --> PERM
+    WATCHLISTS --> PERM
+    APPROVALS --> PERM
+    REPORTS --> PERM
+    COPILOT --> PERM
+
+    RESEARCH --> DB_SESS
+    WATCHLISTS --> DB_SESS
+    APPROVALS --> DB_SESS
+    REPORTS --> DB_SESS
+    COPILOT --> DB_SESS
+
+    RESEARCH --> SETTINGS
+    WATCHLISTS --> SETTINGS
+    APPROVALS --> SETTINGS
+    REPORTS --> SETTINGS
+    COPILOT --> SETTINGS
+
+    %% Service Layer Connections
+    RESEARCH --> MANAGER
+    RESEARCH --> ORCHESTRATOR
+    RESEARCH --> PLANNER
+
+    COPILOT --> COPILOT_AGENT
+    COPILOT_AGENT --> PLANNER
+    COPILOT_AGENT --> TOOL_REGISTRY
+    COPILOT_AGENT --> COLLAB
+    COPILOT_AGENT --> DECISION
+    COPILOT_AGENT --> EXPLAIN
+    COPILOT_AGENT --> MEMORY
+    COPILOT_AGENT --> LLM_ROUTER
+
+    TOOL_REGISTRY --> FD
+    TOOL_REGISTRY --> SA
+    TOOL_REGISTRY --> RA
+    TOOL_REGISTRY --> CI
+    TOOL_REGISTRY --> NA
+    TOOL_REGISTRY --> MDA
+    TOOL_REGISTRY --> ISA
+    TOOL_REGISTRY --> KGA
+    TOOL_REGISTRY --> PA
+    TOOL_REGISTRY --> PDA
+    TOOL_REGISTRY --> AA
+    TOOL_REGISTRY --> ANA
+    TOOL_REGISTRY --> HIA
+    TOOL_REGISTRY --> CAM
+
+    MANAGER --> FD
+    MANAGER --> SA
+    MANAGER --> RA
+    MANAGER --> CI
+    MANAGER --> NA
+    MANAGER --> MDA
+    MANAGER --> ISA
+    MANAGER --> KGA
+    MANAGER --> PA
+    MANAGER --> PDA
+    MANAGER --> AA
+    MANAGER --> ANA
+    MANAGER --> HIA
+    MANAGER --> CAM
+
+    ORCHESTRATOR --> MANAGER
+    PLANNER --> MANAGER
+
+    COLLAB --> MANAGER
+    COLLAB --> FD
+    COLLAB --> SA
+    COLLAB --> RA
+    COLLAB --> CI
+    COLLAB --> NA
+    COLLAB --> MDA
+    COLLAB --> ISA
+    COLLAB --> KGA
+    COLLAB --> PA
+    COLLAB --> PDA
+    COLLAB --> AA
+    COLLAB --> ANA
+    COLLAB --> HIA
+    COLLAB --> CAM
+
+    DECISION --> MANAGER
+    DECISION --> TOOL_REGISTRY
+    EXPLAIN --> MANAGER
+    EXPLAIN --> TOOL_REGISTRY
+
+    LLM_ROUTER --> OPENROUTER
+
+    FD --> PG
+    FD --> CHROMA
+    FD --> SEC
+    SA --> NEWS_API
+    SA --> REDIS
+    RA --> PG
+    RA --> REDIS
+    CI --> PG
+    NA --> NEWS_API
+    NA --> REDIS
+    MDA --> MARKET_API
+    MDA --> REDIS
+    ISA --> FD
+    ISA --> SA
+    ISA --> RA
+    ISA --> CI
+    ISA --> NA
+    ISA --> MDA
+    ISA --> KGA
+    ISA --> PA
+    ISA --> PDA
+    ISA --> AA
+    ISA --> ANA
+    ISA --> HIA
+    ISA --> CAM
+    KGA --> PG
+    KGA --> CHROMA
+    PA --> PG
+    PA --> REDIS
+    PDA --> PG
+    AA --> PG
+    AA --> REDIS
+    AA --> NEWS_API
+    ANA --> PG
+    HIA --> PG
+    CAM --> PG
+
+    INCREMENTAL --> SEC
+    INCREMENTAL --> FD
+    ALERT_ENGINE --> AA
+    ALERT_ENGINE --> NEWS_API
+    ALERT_ENGINE --> MARKET_API
+
+    METRICS --> PG
+    METRICS --> REDIS
+    METRICS --> CHROMA
+    HEALTH --> PG
+    HEALTH --> REDIS
+    HEALTH --> CHROMA
+    HEALTH --> OPENROUTER
+
+    style CLI fill:#e3f2fd
+    style UI fill:#e3f2fd
+    style RESEARCH fill:#fce4ec
+    style COPILOT fill:#fce4ec
+    style MANAGER fill:#e8f5e9
+    style ORCHESTRATOR fill:#e8f5e9
+    style PG fill:#f3e5f5
+    style CHROMA fill:#e0f2f1
+    style REDIS fill:#fff3e0
+    style OPENROUTER fill:#fff3e0
+```
+
+---
+
+# API Flow Diagram
+
+**Purpose**: Complete request flow from client through FastAPI middleware, routing, dependency injection, service layer, agents, to data stores.
+
+---
+
+## Request Flow Summary
+
+```
+Client Request
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    MIDDLEWARE STACK (Order Matters)             │
+├─────────────────────────────────────────────────────────────────┤
+│ 1. CORSMiddleware          │ Origin validation, preflight       │
+│ 2. RateLimitMiddleware     │ Token bucket (local) + Sliding     │
+│                            │ window (Redis), adaptive limits    │
+│ 3. LoggingMiddleware       │ Correlation IDs, structured JSON,  │
+│                            │ PII redaction, security events     │
+│ 4. SecurityMiddleware      │ JWT RS256 validation, API Key      │
+│                            │ bcrypt, RBAC (Admin/Analyst/Viewer)│
+│ 5. CompressionMiddleware   │ Gzip/Brotli, minimum size 500B     │
+└─────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      ROUTE MATCHING                              │
+├─────────────────────────────────────────────────────────────────┤
+│ /api/v1/research/*    → ResearchRouter (Phase 7)                │
+│ /api/v1/watchlists/*  → WatchlistRouter (Phase 7)               │
+│ /api/v1/approval/*    → ApprovalRouter (Phase 7)                │
+│ /api/v1/reports/*     → ReportRouter (Phase 7)                  │
+│ /api/v1/copilot/*     → CopilotRouter (Phase 8)                 │
+│ /health/*             → HealthRouter (Phase 6)                  │
+└─────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  DEPENDENCY INJECTION                            │
+├─────────────────────────────────────────────────────────────────┤
+│ get_current_user()    → JWT validation → User object            │
+│ require_permission()  → RBAC check (20+ permissions)            │
+│ get_session()         → AsyncSession (SQLAlchemy 2.0)           │
+│ get_settings()        → Typed Settings (Pydantic, 80+ fields)   │
+└─────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      SERVICE LAYER                               │
+├─────────────────────────────────────────────────────────────────┤
+│ Research Endpoints    → ManagerAgent + WorkflowOrchestrator     │
+│                       → ResearchPlannerAgent                    │
+│ Copilot Endpoints     → CopilotAgent (Intent → Plan → Execute)  │
+│                       → ToolRegistry (15 tools, 14 categories)  │
+│                       → CollaborationCoordinator (10 signals)   │
+│                       → DecisionEngine (6-step reasoning)       │
+│                       → ExplainabilityEngine (evidence, risks)  │
+│                       → EnhancedMemoryStore (5 scopes)          │
+│                       → LLMRouter (9 models, 4 goals, adaptive) │
+└─────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      AGENT LAYER (14 Agents)                     │
+├─────────────────────────────────────────────────────────────────┤
+│ All agents implement BaseWorkerAgent:                           │
+│   async def run(company: str, context: Dict) -> Dict[str, Any]  │
+│                                                                 │
+│ ManagerAgent orchestrates all 14 agents via registry            │
+│ WorkflowOrchestrator: topological sort → parallel waves         │
+│ ResearchPlannerAgent: LLM-driven dynamic planning               │
+└─────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    DATA & INFRASTRUCTURE                         │
+├─────────────────────────────────────────────────────────────────┤
+│ PostgreSQL (27 tables)  ← All persistent state                 │
+│ ChromaDB (5 collections) ← Vector embeddings (BGE-M3, 1024-dim) │
+│ Redis (Cache/Sessions/RateLimit) ← High-speed operations       │
+│ SEC EDGAR (10 req/s) ← Filings                                 │
+│ 6 News Providers ← Multi-source news                            │
+│ Market Data APIs ← Yahoo, AlphaVantage, Finnhub                 │
+│ OpenRouter (9 models) ← LLM inference                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Key API Endpoints
+
+### Research (Phase 7)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/research/start` | Start autonomous research |
+| GET | `/api/v1/research/{id}` | Get research status/results |
+| GET | `/api/v1/research/history` | List research history |
+| GET | `/api/v1/research/status` | System capacity & active executions |
+
+### Watchlists (Phase 7)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/watchlists` | Create watchlist (5 types) |
+| GET | `/api/v1/watchlists` | List watchlists |
+| GET | `/api/v1/watchlists/{id}` | Get watchlist details |
+| POST | `/api/v1/watchlists/{id}/companies` | Add company |
+| DELETE | `/api/v1/watchlists/{id}/companies/{symbol}` | Remove company |
+| POST | `/api/v1/watchlists/{id}/alerts` | Create alert rule |
+
+### Approvals (Phase 7)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/approval/{id}` | Get approval request |
+| POST | `/api/v1/approval/{id}/action` | Process approval action |
+| GET | `/api/v1/approval` | List approval requests |
+
+### Reports (Phase 7)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/reports/generate` | Generate report (8 types, 3 formats) |
+| GET | `/api/v1/reports` | List generated reports |
+
+### Copilot (Phase 8)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/copilot/chat` | Natural language chat (SSE streaming) |
+| POST | `/api/v1/copilot/sessions` | Create session |
+| GET | `/api/v1/copilot/sessions` | List sessions |
+| POST | `/api/v1/copilot/sessions/{id}/plan` | Create execution plan |
+| POST | `/api/v1/copilot/sessions/{id}/execute` | Execute plan |
+| GET | `/api/v1/copilot/tools` | List available tools |
+| POST | `/api/v1/copilot/tools/execute` | Execute specific tool |
+| GET | `/api/v1/copilot/sessions/{id}/history` | Session history |
+| GET | `/api/v1/copilot/sessions/{id}/status` | Session status |
+
+### Health (Phase 6)
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /health` | Basic liveness |
+| `GET /health/live` | Kubernetes liveness probe |
+| `GET /health/ready` | Kubernetes readiness probe |
+| `GET /health/detailed` | Full component health |
+| `GET /metrics` | Prometheus metrics (30+) |
+
+---
+
+## Authentication & Authorization
+
+### JWT (RS256)
+```python
+# Header
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Payload
+{
+  "sub": "user123",
+  "roles": ["analyst"],
+  "permissions": ["research:create", "research:read", "watchlist:*"],
+  "exp": 1705564800
+}
+```
+
+### API Key
+```bash
+# Header
+X-API-Key: fra_live_abc123def456...
+
+# Or query param (less secure)
+?api_key=fra_live_abc123def456...
+```
+
+### RBAC Permissions
+| Role | Permissions |
+|------|-------------|
+| `admin` | All (`*`, `admin:*`) |
+| `analyst` | `research:*`, `watchlist:*`, `report:*`, `approval:*`, `copilot:*` |
+| `viewer` | `research:read`, `watchlist:read`, `report:read`, `copilot:chat` |
+| `api_only` | `research:create`, `research:read`, `copilot:chat`, `copilot:plan` |
+
+---
+
+## Rate Limiting Headers
+
+```http
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1705564800
+Retry-After: 30  # On 429 response
+```
+
+---
+
+## Error Response Format
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input parameters",
+    "details": [
+      {"field": "company", "message": "Company ticker required"}
+    ],
+    "request_id": "req_abc123"
+  }
+}
+```
+
+| HTTP Code | Meaning |
+|-----------|---------|
+| 200 | Success |
+| 201 | Created |
+| 202 | Accepted (async) |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 422 | Validation Error |
+| 429 | Rate Limited |
+| 500 | Internal Error |
+| 503 | Service Unavailable |
+
+---
+
+*Document Version: 1.0*  
+*Last Updated: 2026-07-18*  
+*Platform: Agentic Financial Intelligence Platform v1.7.0-phase8*

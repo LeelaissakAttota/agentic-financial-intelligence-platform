@@ -1,0 +1,205 @@
+```mermaid
+graph TB
+    subgraph "User Interfaces"
+        CLI[CLI]
+        REST_API[REST API<br/>FastAPI]
+        STREAMLIT[Streamlit Dashboard]
+    end
+
+    subgraph "Copilot Orchestration Layer (Phase 8)"
+        COPILOT[Copilot Agent]
+        TASK_PLANNER[Task Planner]
+        TOOL_SELECTOR[Tool Selector]
+        DECISION_ENGINE[Decision Engine]
+        COLLABORATION[Collaboration Layer]
+        MEMORY[Enhanced Memory]
+        EXPLAINABILITY[Explainability]
+        LLM_ROUTER[LLM Orchestrator<br/>9 Models, 4 Goals]
+    end
+
+    subgraph "Workflow Orchestration (Phase 7)"
+        RESEARCH_PLANNER[Research Planner]
+        WORKFLOW_ORCHESTRATOR[Workflow Orchestrator]
+        WATCHLISTS[Watchlists & Alerts]
+        REPORTS[Report Generator]
+        APPROVALS[Approval Workflow]
+    end
+
+    subgraph "Agent Layer (14 Specialized Agents)"
+        AGENT_FD[Financial Document]
+        AGENT_SENT[Sentiment]
+        AGENT_RISK[Risk Assessment]
+        AGENT_COMP[Competitive Intel]
+        AGENT_NEWS[News Intelligence]
+        AGENT_MKT[Market Data]
+        AGENT_INV[Investment Summary]
+        AGENT_KG[Knowledge Graph]
+        AGENT_PORT[Portfolio]
+        AGENT_PAT[Patterns]
+        AGENT_ALERT[Alerts]
+        AGENT_ANAL[Analytics]
+        AGENT_HIST[Historical]
+        AGENT_MEM[Cross-Agent Memory]
+    end
+
+    subgraph "Supporting Infrastructure"
+        LLM_ORCH[LLM Orchestration]
+        TOOL_REG[Tool Registry<br/>15 Tools]
+        CACHE[Cache Layer<br/>L1 Memory + L2 Redis]
+        MONITORING[Monitoring<br/>Prometheus + Health]
+        SECURITY[Security<br/>JWT + RBAC + Rate Limit]
+    end
+
+    subgraph "Data & Infrastructure Layer"
+        POSTGRES[(PostgreSQL<br/>27 Tables)]
+        CHROMADB[(ChromaDB<br/>Vector Store)]
+        REDIS[(Redis<br/>Cache + Sessions)]
+        SEC_EDGAR[SEC EDGAR]
+        NEWS_APIS[6 News APIs]
+        MARKET_DATA[Market Data APIs]
+    end
+
+    CLI --> REST_API
+    STREAMLIT --> REST_API
+    REST_API --> COPILOT
+    COPILOT --> TASK_PLANNER
+    COPILOT --> TOOL_SELECTOR
+    COPILOT --> DECISION_ENGINE
+    COPILOT --> COLLABORATION
+    COPILOT --> MEMORY
+    COPILOT --> EXPLAINABILITY
+    COPILOT --> LLM_ROUTER
+    
+    TASK_PLANNER --> RESEARCH_PLANNER
+    RESEARCH_PLANNER --> WORKFLOW_ORCHESTRATOR
+    WORKFLOW_ORCHESTRATOR --> WATCHLISTS
+    WORKFLOW_ORCHESTRATOR --> REPORTS
+    WORKFLOW_ORCHESTRATOR --> APPROVALS
+    
+    WORKFLOW_ORCHESTRATOR --> AGENT_FD
+    WORKFLOW_ORCHESTRATOR --> AGENT_SENT
+    WORKFLOW_ORCHESTRATOR --> AGENT_RISK
+    WORKFLOW_ORCHESTRATOR --> AGENT_COMP
+    WORKFLOW_ORCHESTRATOR --> AGENT_NEWS
+    WORKFLOW_ORCHESTRATOR --> AGENT_MKT
+    WORKFLOW_ORCHESTRATOR --> AGENT_INV
+    WORKFLOW_ORCHESTRATOR --> AGENT_KG
+    WORKFLOW_ORCHESTRATOR --> AGENT_PORT
+    WORKFLOW_ORCHESTRATOR --> AGENT_PAT
+    WORKFLOW_ORCHESTRATOR --> AGENT_ALERT
+    WORKFLOW_ORCHESTRATOR --> AGENT_ANAL
+    WORKFLOW_ORCHESTRATOR --> AGENT_HIST
+    WORKFLOW_ORCHESTRATOR --> AGENT_MEM
+
+    AGENT_FD --> LLM_ORCH
+    AGENT_SENT --> LLM_ORCH
+    AGENT_RISK --> LLM_ORCH
+    AGENT_COMP --> LLM_ORCH
+    AGENT_NEWS --> LLM_ORCH
+    AGENT_MKT --> LLM_ORCH
+    AGENT_INV --> LLM_ORCH
+    AGENT_KG --> LLM_ORCH
+    AGENT_PORT --> LLM_ORCH
+    AGENT_PAT --> LLM_ORCH
+    AGENT_ALERT --> LLM_ORCH
+    AGENT_ANAL --> LLM_ORCH
+    AGENT_HIST --> LLM_ORCH
+    AGENT_MEM --> LLM_ORCH
+
+    TOOL_REG --> AGENT_FD
+    TOOL_REG --> AGENT_SENT
+    TOOL_REG --> AGENT_RISK
+    TOOL_REG --> AGENT_COMP
+    TOOL_REG --> AGENT_NEWS
+    TOOL_REG --> AGENT_MKT
+    TOOL_REG --> AGENT_INV
+    TOOL_REG --> AGENT_KG
+    TOOL_REG --> AGENT_PORT
+    TOOL_REG --> AGENT_PAT
+    TOOL_REG --> AGENT_ALERT
+    TOOL_REG --> AGENT_ANAL
+    TOOL_REG --> AGENT_HIST
+    TOOL_REG --> AGENT_MEM
+
+    CACHE --> AGENT_FD
+    CACHE --> AGENT_SENT
+    CACHE --> AGENT_RISK
+    CACHE --> AGENT_COMP
+    CACHE --> AGENT_NEWS
+    CACHE --> AGENT_MKT
+    CACHE --> AGENT_INV
+    CACHE --> AGENT_KG
+    CACHE --> AGENT_PORT
+    CACHE --> AGENT_PAT
+    CACHE --> AGENT_ALERT
+    CACHE --> AGENT_ANAL
+    CACHE --> AGENT_HIST
+    CACHE --> AGENT_MEM
+
+    MONITORING --> REST_API
+    MONITORING --> AGENT_FD
+    MONITORING --> AGENT_SENT
+    MONITORING --> AGENT_RISK
+    MONITORING --> AGENT_COMP
+    MONITORING --> AGENT_NEWS
+    MONITORING --> AGENT_MKT
+    MONITORING --> AGENT_INV
+    MONITORING --> AGENT_KG
+    MONITORING --> AGENT_PORT
+    MONITORING --> AGENT_PAT
+    MONITORING --> AGENT_ALERT
+    MONITORING --> AGENT_ANAL
+    MONITORING --> AGENT_HIST
+    MONITORING --> AGENT_MEM
+
+    SECURITY --> REST_API
+
+    AGENT_FD --> POSTGRES
+    AGENT_FD --> CHROMADB
+    AGENT_SENT --> POSTGRES
+    AGENT_SENT --> REDIS
+    AGENT_RISK --> POSTGRES
+    AGENT_COMP --> POSTGRES
+    AGENT_NEWS --> POSTGRES
+    AGENT_NEWS --> REDIS
+    AGENT_MKT --> POSTGRES
+    AGENT_MKT --> REDIS
+    AGENT_INV --> POSTGRES
+    AGENT_KG --> POSTGRES
+    AGENT_PORT --> POSTGRES
+    AGENT_PAT --> POSTGRES
+    AGENT_ALERT --> POSTGRES
+    AGENT_ANAL --> POSTGRES
+    AGENT_HIST --> POSTGRES
+    AGENT_MEM --> POSTGRES
+
+    AGENT_NEWS --> NEWS_APIS
+    AGENT_MKT --> MARKET_DATA
+    AGENT_FD --> SEC_EDGAR
+
+    LLM_ROUTER --> LLM_ORCH
+    COPILOT --> LLM_ROUTER
+``` 
+
+---
+
+# Overall Architecture Diagram
+
+**Purpose**: Complete system overview showing all layers from user interfaces to data infrastructure.
+
+**Key Layers**:
+1. **User Interfaces** - CLI, REST API, Streamlit Dashboard
+2. **Copilot Orchestration (Phase 8)** - Natural language interface, planning, tool selection, decision making
+3. **Workflow Orchestration (Phase 7)** - Autonomous research workflows, approvals, reports
+4. **Agent Layer** - 14 specialized financial research agents
+5. **Supporting Infrastructure** - LLM routing, tools, caching, monitoring, security
+6. **Data & Infrastructure** - PostgreSQL, ChromaDB, Redis, external APIs
+
+**Data Flow**:
+```
+User → API/Copilot → Task Planner → Workflow Orchestrator → Agents → Infrastructure
+                            ↓
+                    Tool Registry / Memory / LLM Router
+                            ↓
+                      PostgreSQL / ChromaDB / Redis
+```

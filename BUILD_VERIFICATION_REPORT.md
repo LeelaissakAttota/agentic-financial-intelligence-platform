@@ -68,6 +68,7 @@ from api.main import app
 ```bash
 alembic upgrade head
 ```
+
 **Result**: ✅ **MIGRATION SUCCESSFUL** - 7 new tables created, all constraints applied
 
 ---
@@ -176,7 +177,7 @@ venv/Scripts/python -m pytest tests/ -q
 | Sentiment Agent | 13 | ✅ |
 | Competitor Agent | 17 | ✅ |
 | Phase 6 (Prod Hardening) | 45 | ✅ |
-| **Phase 7 (New)** | **78** | **✅** |
+| Phase 7 (Autonomous) | 78 | ✅ |
 | **Phase 8 (New)** | **112** | **✅** |
 
 ---
@@ -190,7 +191,6 @@ docker compose build --no-cache api
 
 ### Result
 ```
-=> => naming to financial_research_agent-api:latest
 => => naming to financial_research_agent-api:latest
 ```
 
@@ -252,7 +252,7 @@ curl http://localhost:8000/openapi.json
 | ✅ Docker Builds | Image created successfully |
 | ✅ Containers Healthy | 5/5 services up |
 | ✅ OpenAPI Valid | Schema generated |
-| ✅ OpenAPI Valid | Schema generated |
+| ✅ Docker Compose | All services up |
 
 ---
 

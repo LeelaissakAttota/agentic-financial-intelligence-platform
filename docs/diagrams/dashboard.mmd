@@ -1,0 +1,206 @@
+```mermaid
+graph TB
+    subgraph "Streamlit Dashboard (Port 8501)"
+        APP[app.py<br/>Main Entry, Routing, Session State]
+        
+        subgraph "Main Tabs (10+)"
+            TAB1[Overview<br/>Market snapshot, portfolio summary, alerts]
+            TAB2[Research<br/>Autonomous workflow, agent status, results]
+            TAB3[Documents<br/>SEC filings browser, RAG query, citations]
+            TAB4[News<br/>Timeline, sentiment, entities, events]
+            TAB5[Market Data<br/>Quotes, charts, technicals, comparison]
+            TAB6[Portfolio<br/>Holdings, risk metrics, optimizer]
+            TAB7[Patterns<br/>Detected patterns, backtest, signals]
+            TAB8[Alerts<br/>Active alerts, rules, history, channels]
+            TAB9[Analytics<br/>Factor models, Monte Carlo, attribution]
+            TAB10[Memory<br/>Cross-agent memory browser, search]
+            TAB11[Settings<br/>API keys, providers, notifications]
+        end
+        
+        subgraph "Copilot Tab (Phase 8)"
+            COPILOT_TAB[copilot.py<br/>5 specialized tabs]
+            
+            subgraph "Copilot Sub-Tabs"
+                CTAB1[Chat<br/>Streaming conversation, agent cards]
+                CTAB2[Workflow<br/>Plan visualization, progress, waves]
+                CTAB3[Decisions<br/>Confidence gauge, Bear/Base/Bull]
+                CTAB4[Evidence<br/>Source docs, excerpts, relevance]
+                CTAB5[Tools<br/>Parameter forms, execution, history]
+            end
+            
+            subgraph "Copilot Sidebar"
+                SIDE1[Session Manager<br/>Create, switch, archive]
+                SIDE2[Agent Status<br/>14 agents, health indicators]
+                SIDE3[Token/Cost Tracker<br/>Session totals, averages]
+            end
+        end
+    end
+
+    subgraph "Reusable Components (components.py)"
+        CHARTS[Charts<br/>Candlestick, sentiment timeline, risk gauges]
+        TABLES[Tables<br/>Holdings editor, alert rules, memory browser]
+        FORMS[Forms<br/>Watchlist builder, alert rule builder, report generator]
+        LAYOUT[Layout<br/>Metric cards, tabs, expanders, columns]
+    end
+
+    subgraph "State Management"
+        SESSION[st.session_state<br/>• research_plan<br/>• agent_outputs<br/>• selected_company<br/>• execution_plan<br/>• last_decision<br/>• last_evidence<br/>• tool_history<br/>• token_usage<br/>• messages]
+        
+        SHARED[Shared Keys Across Tabs<br/>• selected_company<br/>• research_plan<br/>• execution_plan<br/>• agent_outputs<br/>• last_decision<br/>• last_evidence<br/>• tool_history<br/>• token_usage]
+    end
+
+    subgraph "Real-time Updates"
+        AUTOREFRESH[st_autorefresh<br/>5s interval during research]
+        POLLING[API Polling<br/>/health/detailed, /research/{id}]
+        EVENTS[Event Handling<br/>Step completion, approval required]
+    end
+
+    subgraph "API Client Layer"
+        API_CLIENT[api_client.py<br/>REST + SSE streaming]
+        ENDPOINTS[Endpoints Used<br/>/api/v1/research/*<br/>/api/v1/watchlists/*<br/>/api/v1/approval/*<br/>/api/v1/reports/*<br/>/api/v1/copilot/*<br/>/health/*<br/>/metrics]
+    end
+
+    subgraph "Backend Services (Port 8000)"
+        FASTAPI[FastAPI Application<br/>Middleware stack]
+        AGENTS[14 Specialized Agents]
+        ORCHESTRATOR[Workflow Orchestrator]
+        COPILOT[Copilot Agent]
+        DB[(PostgreSQL)]
+        VECTOR[(ChromaDB)]
+        CACHE[(Redis)]
+    end
+
+    %% Connections
+    APP --> TAB1
+    APP --> TAB2
+    APP --> TAB3
+    APP --> TAB4
+    APP --> TAB5
+    APP --> TAB6
+    APP --> TAB7
+    APP --> TAB8
+    APP --> TAB9
+    APP --> TAB10
+    APP --> TAB11
+    APP --> COPILOT_TAB
+
+    COPILOT_TAB --> CTAB1
+    COPILOT_TAB --> CTAB2
+    COPILOT_TAB --> CTAB3
+    COPILOT_TAB --> CTAB4
+    COPILOT_TAB --> CTAB5
+    COPILOT_TAB --> SIDE1
+    COPILOT_TAB --> SIDE2
+    COPILOT_TAB --> SIDE3
+
+    TAB1 --> CHARTS
+    TAB1 --> TABLES
+    TAB1 --> FORMS
+    TAB2 --> CHARTS
+    TAB2 --> TABLES
+    TAB2 --> FORMS
+    TAB3 --> CHARTS
+    TAB3 --> TABLES
+    TAB4 --> CHARTS
+    TAB4 --> TABLES
+    TAB5 --> CHARTS
+    TAB6 --> CHARTS
+    TAB6 --> TABLES
+    TAB6 --> FORMS
+    TAB7 --> CHARTS
+    TAB7 --> TABLES
+    TAB8 --> CHARTS
+    TAB8 --> TABLES
+    TAB8 --> FORMS
+    TAB9 --> CHARTS
+    TAB9 --> TABLES
+    TAB10 --> CHARTS
+    TAB10 --> TABLES
+    TAB11 --> FORMS
+
+    CTAB1 --> CHARTS
+    CTAB1 --> TABLES
+    CTAB1 --> FORMS
+    CTAB2 --> CHARTS
+    CTAB3 --> CHARTS
+    CTAB4 --> TABLES
+    CTAB5 --> CHARTS
+    CTAB5 --> TABLES
+    CTAB5 --> FORMS
+
+    TAB1 --> SESSION
+    TAB2 --> SESSION
+    TAB3 --> SESSION
+    TAB4 --> SESSION
+    TAB5 --> SESSION
+    TAB6 --> SESSION
+    TAB7 --> SESSION
+    TAB8 --> SESSION
+    TAB9 --> SESSION
+    TAB10 --> SESSION
+    TAB11 --> SESSION
+
+    CTAB1 --> SESSION
+    CTAB2 --> SESSION
+    CTAB3 --> SESSION
+    CTAB4 --> SESSION
+    CTAB5 --> SESSION
+
+    SESSION --> SHARED
+    SHARED --> TAB1
+    SHARED --> TAB2
+    SHARED --> TAB3
+    SHARED --> TAB4
+    SHARED --> TAB5
+    SHARED --> TAB6
+    SHARED --> TAB7
+    SHARED --> TAB8
+    SHARED --> TAB9
+    SHARED --> TAB10
+    SHARED --> TAB11
+    SHARED --> CTAB1
+    SHARED --> CTAB2
+    SHARED --> CTAB3
+    SHARED --> CTAB4
+    SHARED --> CTAB5
+
+    TAB2 --> AUTOREFRESH
+    CTAB2 --> AUTOREFRESH
+    TAB2 --> POLLING
+    CTAB2 --> POLLING
+    TAB2 --> EVENTS
+    CTAB2 --> EVENTS
+
+    TAB1 --> API_CLIENT
+    TAB2 --> API_CLIENT
+    TAB3 --> API_CLIENT
+    TAB4 --> API_CLIENT
+    TAB5 --> API_CLIENT
+    TAB6 --> API_CLIENT
+    TAB7 --> API_CLIENT
+    TAB8 --> API_CLIENT
+    TAB9 --> API_CLIENT
+    TAB10 --> API_CLIENT
+    TAB11 --> API_CLIENT
+    CTAB1 --> API_CLIENT
+    CTAB2 --> API_CLIENT
+    CTAB3 --> API_CLIENT
+    CTAB4 --> API_CLIENT
+    CTAB5 --> API_CLIENT
+
+    API_CLIENT --> ENDPOINTS
+    ENDPOINTS --> FASTAPI
+
+    FASTAPI --> AGENTS
+    FASTAPI --> ORCHESTRATOR
+    FASTAPI --> COPILOT
+    FASTAPI --> DB
+    FASTAPI --> VECTOR
+    FASTAPI --> CACHE
+
+    style APP fill:#e3f2fd
+    style COPILOT_TAB fill:#fce4ec
+    style SESSION fill:#fff3e0
+    style API_CLIENT fill:#e8f5e9
+    style FASTAPI fill:#e3f2fd
+```

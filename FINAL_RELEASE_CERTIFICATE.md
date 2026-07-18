@@ -143,7 +143,7 @@ tests/phase7/test_copilot_api.py .............
 ### Multi-Agent Intelligence
 - 10 coordination signals for inter-agent communication
 - 5 consensus mechanisms (majority, weighted, unanimous, threshold, borda)
-- Conflict detection (sentiment, recommendation opposition)
+- Conflict detection (sentiment opposition, recommendation contradiction)
 - Knowledge graph integration (entities, relationships, paths)
 
 ### Explainable Decision Making
@@ -153,7 +153,7 @@ tests/phase7/test_copilot_api.py .............
 - 10 evidence types with relevance scoring
 
 ### Intelligent LLM Routing
-- 9 models across 4 providers (Anthropic, OpenAI, Google, DeepSeek)
+- 9 models across 4 providers (Anthropic, OpenAI, Google, DeepSeek, Mistral)
 - 4 optimization goals (cost, latency, quality, balanced)
 - Health monitoring with automatic fallback chains
 - Adaptive learning from execution history

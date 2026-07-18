@@ -1,0 +1,129 @@
+```mermaid
+graph TB
+    subgraph "Knowledge Graph Nodes (14 Types)"
+        COMPANY[Company<br/>ticker, name, sector, market_cap]
+        PERSON[Person<br/>name, role, company]
+        PRODUCT[Product<br/>name, category, company]
+        EVENT[Event<br/>type, date, impact, description]
+        FILING[Filing<br/>accession, form_type, date]
+        METRIC[Metric<br/>name, value, period, unit]
+        RISK[Risk<br/>category, severity, likelihood]
+        OPPORTUNITY[Opportunity<br/>description, confidence]
+        PATTERN[Pattern<br/>type, timeframe, confidence]
+        SENTIMENT[Sentiment<br/>score, source, timeframe]
+        RELATIONSHIP[Relationship<br/>type, strength, direction]
+        THEME[Theme<br/>name, keywords, relevance]
+        SOURCE[Source<br/>url, type, credibility]
+        AGENT_OUT[Agent Output<br/>agent_type, content, confidence]
+    end
+
+    subgraph "Relationship Types (28)"
+        OWNS[OWNS<br/>Company → Product]
+        COMPETES[COMPETES_WITH<br/>Company ↔ Company]
+        PARTNERS[PARTNERS_WITH<br/>Company ↔ Company]
+        SUPPLIES[SUPPLIES_TO<br/>Company → Company]
+        ACQUIRED[ACQUIRED<br/>Company → Company]
+        MENTIONED_IN[MENTIONED_IN<br/>Entity → Filing/News]
+        REPORTED_IN[REPORTED_IN<br/>Metric → Filing]
+        HAS_RISK[HAS_RISK<br/>Company → Risk]
+        HAS_OPP[HAS_OPPORTUNITY<br/>Company → Opportunity]
+        DETECTED_IN[DETECTED_IN<br/>Pattern → Metric/Price]
+        AFFECTS[AFFECTS<br/>Event → Company/Metric]
+        LED_BY[LED_BY<br/>Company → Person]
+        WORKS_AT[WORKS_AT<br/>Person → Company]
+        AUTHORED[AUTHORED_BY<br/>Filing/Report → Person]
+        CITES[CITES<br/>Source → Filing/Report]
+        SIMILAR_TO[SIMILAR_TO<br/>Company ↔ Company]
+        CORRELATES[CORRELATES_WITH<br/>Metric ↔ Metric]
+        IMPLIES[IMPLIES<br/>Pattern → Opportunity/Risk]
+        TRENDS[TRENDS_WITH<br/>Metric ↔ Metric]
+        DRIVES[DRIVES<br/>Event → Sentiment]
+        INFLUENCES[INFLUENCES<br/>Person → Company]
+        BELONGS_TO[BELONGS_TO<br/>Product → Theme]
+        PART_OF[PART_OF<br/>Entity → Theme]
+        DERIVED_FROM[DERIVED_FROM<br/>Agent Output → Source]
+        CONTRADICTS[CONTRADICTS<br/>Agent Output ↔ Agent Output]
+        SUPPORTS[SUPPORTS<br/>Agent Output → Agent Output]
+        DEPENDS_ON[DEPENDS_ON<br/>Agent Output → Source]
+    end
+
+    subgraph "Graph Operations"
+        TRAVERSAL[Traversal<br/>BFS, DFS, Shortest Path]
+        CENTRALITY[Centrality<br/>Degree, Betweenness, PageRank]
+        COMMUNITY[Community Detection<br/>Louvain, Label Propagation]
+        SIMILARITY[Entity Similarity<br/>Jaccard, Cosine, Embedding]
+        PATHS[Path Finding<br/>All paths, Min weight]
+        SUBGRAPH[Subgraph Extraction<br/>k-hop neighborhood]
+    end
+
+    subgraph "Persistence Layer"
+        PG[(PostgreSQL<br/>Adjacency List)]
+        VECTOR[(pgvector<br/>Embeddings)]
+        CACHE[Redis Cache<br/>Hot subgraphs]
+    end
+
+    subgraph "Agent Integration"
+        KG_AGENT[Knowledge Graph Agent<br/>Query interface]
+        COLLAB[Collaboration Layer<br/>Entity context sharing]
+        PLANNER[Research Planner<br/>Graph-aware planning]
+        CITATION[Citation Engine<br/>Source tracking]
+    end
+
+    %% Node connections via relationships
+    COMPANY -.->|OWNS| PRODUCT
+    COMPANY -.->|COMPETES_WITH| COMPANY
+    COMPANY -.->|PARTNERS_WITH| COMPANY
+    COMPANY -.->|SUPPLIES_TO| COMPANY
+    COMPANY -.->|ACQUIRED| COMPANY
+    COMPANY -.->|MENTIONED_IN| FILING
+    COMPANY -.->|MENTIONED_IN| EVENT
+    COMPANY -.->|HAS_RISK| RISK
+    COMPANY -.->|HAS_OPP| OPPORTUNITY
+    COMPANY -.->|LED_BY| PERSON
+    COMPANY -.->|PART_OF| THEME
+    PERSON -.->|WORKS_AT| COMPANY
+    PERSON -.->|INFLUENCES| COMPANY
+    PERSON -.->|AUTHORED_BY| FILING
+    FILING -.->|REPORTED_IN| METRIC
+    FILING -.->|CITES| SOURCE
+    EVENT -.->|AFFECTS| COMPANY
+    EVENT -.->|AFFECTS| METRIC
+    EVENT -.->|DRIVES| SENTIMENT
+    METRIC -.->|CORRELATES_WITH| METRIC
+    METRIC -.->|TRENDS_WITH| METRIC
+    PATTERN -.->|DETECTED_IN| METRIC
+    PATTERN -.->|IMPLIES| OPPORTUNITY
+    PATTERN -.->|IMPLIES| RISK
+    SOURCE -.->|CITES| FILING
+    AGENT_OUT -.->|DERIVED_FROM| SOURCE
+    AGENT_OUT -.->|CONTRADICTS| AGENT_OUT
+    AGENT_OUT -.->|SUPPORTS| AGENT_OUT
+    AGENT_OUT -.->|DEPENDS_ON| SOURCE
+
+    %% Graph operations
+    PG --> TRAVERSAL
+    PG --> CENTRALITY
+    PG --> COMMUNITY
+    VECTOR --> SIMILARITY
+    PG --> PATHS
+    PG --> SUBGRAPH
+    CACHE --> TRAVERSAL
+    CACHE --> CENTRALITY
+
+    %% Agent integration
+    KG_AGENT --> TRAVERSAL
+    KG_AGENT --> CENTRALITY
+    KG_AGENT --> COMMUNITY
+    KG_AGENT --> SIMILARITY
+    KG_AGENT --> PATHS
+    KG_AGENT --> SUBGRAPH
+    
+    COLLAB --> KG_AGENT
+    PLANNER --> KG_AGENT
+    CITATION --> KG_AGENT
+
+    style COMPANY fill:#e3f2fd
+    style PG fill:#f3e5f5
+    style KG_AGENT fill:#e8f5e9
+    style COLLAB fill:#fff3e0
+```

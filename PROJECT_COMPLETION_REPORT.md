@@ -79,7 +79,7 @@ Agentic Financial Intelligence Platform (v1.7.0-phase8)
 │      ├── Research Planner Agent (LLM-driven, 4 complexity levels)
 │      ├── Workflow Orchestrator (Topological sort, parallel waves)
 │      ├── Research Memory (7 types, pgvector-ready)
-│      ├── Watchlists & Monitoring (5 types, 10+ conditions)
+│      ├── Watchlists & Monitoring (5 types, 10+ alert conditions)
 │      ├── Automated Report Generator (8 types, 3 formats)
 │      ├── Notification Engine (6 channels, retry logic)
 │      ├── Human Approval Workflow (6 actions, audit trail)
@@ -88,7 +88,7 @@ Agentic Financial Intelligence Platform (v1.7.0-phase8)
      ├── AI Copilot (Natural language, multi-turn, streaming)
      ├── Task Planner (Goal decomposition, dependencies, cost/token)
      ├── Tool Registry (15 tools, 14 categories, confidence)
-     ├── Agent Collaboration (Coordination, delegation, consensus)
+     ├── Agent Collaboration (10 signals, 5 consensus methods)
      ├── Decision Engine (6-step reasoning, hidden internal logic)
      ├── Explainability (10 evidence types, 7 explanation types)
      ├── LLM Orchestration (9 models, 4 goals, adaptive learning)
@@ -105,7 +105,7 @@ Agentic Financial Intelligence Platform (v1.7.0-phase8)
 | Metric | Value |
 |--------|-------|
 | **Total Lines of Code** | ~65,000+ |
-| **Python Files** | 200+ |
+| **Python Files** | 250+ |
 | **Test Files** | 45+ |
 | **Total Tests** | 398 (396 passing, 2 skipped) |
 | **Test Coverage** | ~92% |
@@ -228,7 +228,7 @@ Agentic Financial Intelligence Platform (v1.7.0-phase8)
 ### Planned Capabilities (Q3 2026)
 - [ ] Neo4j Knowledge Graph integration
 - [ ] Cross-agent vector similarity search
-- [ ] Real-time WebSocket dashboard updates
+- [ ] Real-time WebSocket dashboard
 - [ ] Multi-asset Monte Carlo with copula correlation
 - [ ] Causal inference engine for event attribution
 - [ ] Automated thesis generation with evidence chains
@@ -308,7 +308,7 @@ Agentic Financial Intelligence Platform (v1.7.0-phase8)
 The Agentic Financial Intelligence Platform has successfully evolved from a **basic 7-agent research system** to a **comprehensive, production-grade, AI-powered financial research copilot** through 8 disciplined phases of development.
 
 ### Achievement Summary
-- ✅ **8 Specialized AI Agents** with standardized interfaces
+- ✅ **14 Specialized AI Agents** with standardized interfaces
 - ✅ **AI Financial Copilot** with natural language interface
 - ✅ **Autonomous Research Workflows** with dynamic planning and execution
 - ✅ **Production Hardening** with full observability, security, and resilience

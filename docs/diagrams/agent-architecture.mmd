@@ -1,0 +1,313 @@
+```mermaid
+graph TB
+    subgraph "Base Worker Agent"
+        BASE[BaseWorkerAgent<br/>Abstract Base Class]
+        RUN[run(company, context) -> Dict<br/>Abstract method]
+        TASK[create_task(task_type, company, query, context) -> Task]
+        LLM[_call_llm(prompt, system) -> Dict<br/>OpenRouterClient integration]
+        ERROR[Structured Exceptions<br/>AgentError, ValidationError, TimeoutError]
+        COST[Cost Tracking<br/>tokens_used, cost_usd per execution]
+    end
+
+    subgraph "Agent Registry (ManagerAgent)"
+        REGISTRY[Agent Registry<br/>Dict[str, BaseWorkerAgent]]
+        REGISTER[register_agent(name, agent)]
+        GET[get_agent(name) -> BaseWorkerAgent]
+        HEALTH[check_health() -> Dict[str, AgentHealth]]
+    end
+
+    subgraph "Specialized Agents (14)"
+        FD[FinancialDocumentAgent<br/>RAG over SEC filings, earnings, reports]
+        SA[SentimentAnalysisAgent<br/>Multi-source, credibility-weighted]
+        RA[RiskAssessmentAgent<br/>VaR/CVaR, stress testing, multi-category]
+        CI[CompetitiveIntelligenceAgent<br/>Peer comparison, benchmarking]
+        NA[NewsAgent<br/>6 providers, dedup, events, entities]
+        MDA[MarketDataAgent<br/>Real-time, technicals, fundamentals]
+        ISA[InvestmentSummaryAgent<br/>Multi-agent synthesis, thesis]
+        KGA[KnowledgeGraphAgent<br/>14 nodes, 28 edges, graph algos]
+        PA[PortfolioAgent<br/>Positions, VaR, Monte Carlo, 5 rebalance]
+        PDA[PatternDetectionAgent<br/>10 patterns, backtesting]
+        AA[AlertsAgent<br/>30+ types, 5 channels, dedup]
+        ANA[AnalyticsAgent<br/>FF3/5, Monte Carlo 10K, attribution]
+        HIA[HistoricalIntelligenceAgent<br/>Trends, evolution, peer comparison]
+        CAM[CrossAgentMemoryAgent<br/>9 types, 5 scopes, supersession]
+        RPA[ResearchPlannerAgent<br/>4 complexity levels, 14 agents]
+    end
+
+    subgraph "Agent Communication Protocol"
+        INPUT[Standard Input<br/>{company, query, context}]
+        CONTEXT[Context Dictionary<br/>financial_metrics, sentiment, risk_factors, news_events, market_data, peer_comparison, patterns, risk_assessment]
+        OUTPUT[Standard Output<br/>{agent_type, status, data, confidence, citations, metadata}]
+        CITATIONS[Citations<br/>chunk_id, source, section, excerpt, relevance]
+        METADATA[Metadata<br/>execution_time_ms, tokens_used, cost_usd]
+    end
+
+    subgraph "Agent Lifecycle"
+        INIT[Registration at startup]
+        EXEC[run() called by orchestrator]
+        RETRY[Retry with backoff<br/>TransientError handling]
+        CIRCUIT[Circuit Breaker<br/>3-state: Closed/Open/Half-Open]
+        FALLBACK[Graceful Degradation<br/>Fallback agents]
+        HEALTH_CHECK[Health endpoint<br/>Latency, success rate, last check]
+    end
+
+    subgraph "Configuration"
+        ENV[Environment Variables<br/>Agent-specific settings]
+        SETTINGS[Pydantic Settings<br/>Typed, validated]
+    end
+
+    %% Connections
+    BASE --> RUN
+    BASE --> TASK
+    BASE --> LLM
+    BASE --> ERROR
+    BASE --> COST
+
+    REGISTRY --> REGISTER
+    REGISTRY --> GET
+    REGISTRY --> HEALTH
+
+    REGISTRY -.-> FD
+    REGISTRY -.-> SA
+    REGISTRY -.-> RA
+    REGISTRY -.-> CI
+    REGISTRY -.-> NA
+    REGISTRY -.-> MDA
+    REGISTRY -.-> ISA
+    REGISTRY -.-> KGA
+    REGISTRY -.-> PA
+    REGISTRY -.-> PDA
+    REGISTRY -.-> AA
+    REGISTRY -.-> ANA
+    REGISTRY -.-> HIA
+    REGISTRY -.-> CAM
+    REGISTRY -.-> RPA
+
+    INPUT --> RUN
+    CONTEXT --> RUN
+    RUN --> OUTPUT
+    OUTPUT --> CITATIONS
+    OUTPUT --> METADATA
+
+    INIT --> REGISTRY
+    EXEC --> RUN
+    RETRY --> EXEC
+    CIRCUIT --> EXEC
+    FALLBACK --> EXEC
+    HEALTH_CHECK --> HEALTH
+
+    ENV --> SETTINGS
+    SETTINGS --> BASE
+
+    style BASE fill:#e3f2fd
+    style REGISTRY fill:#f3e5f5
+    style FD fill:#e8f5e9
+    style SA fill:#e8f5e9
+    style RA fill:#e8f5e9
+    style CI fill:#e8f5e9
+    style NA fill:#e8f5e9
+    style MDA fill:#e8f5e9
+    style ISA fill:#e8f5e9
+    style KGA fill:#e8f5e9
+    style PA fill:#e8f5e9
+    style PDA fill:#e8f5e9
+    style AA fill:#e8f5e9
+    style ANA fill:#e8f5e9
+    style HIA fill:#e8f5e9
+    style CAM fill:#e8f5e9
+    style RPA fill:#fff3e0
+```
+
+---
+
+# Agent Architecture Diagram
+
+**Purpose**: Complete agent architecture showing the BaseWorkerAgent pattern, 14 specialized agents, registry management, communication protocol, and lifecycle.
+
+---
+
+## BaseWorkerAgent (Abstract Base)
+
+All 14 agents inherit from `BaseWorkerAgent` ensuring consistent interface:
+
+```python
+class BaseWorkerAgent(ABC):
+    def __init__(self, name: str):
+        self.name = name
+        self.llm = OpenRouterClient()
+        self.settings = get_settings()
+    
+    @abstractmethod
+    async def run(self, company: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute agent logic for given company and context."""
+        pass
+    
+    def _create_task(self, task_type: str, company: str, query: str, context: Dict) -> Task:
+        return Task(task_id=uuid.uuid4()[:8], task_type=task_type, company=company, query=query, context=context)
+    
+    async def _call_llm(self, prompt: str, system_prompt: str = "") -> Dict[str, Any]:
+        return await self.llm.agenerate_json(prompt, system_prompt)
+```
+
+**Key Features**:
+- **Standardized I/O**: All agents accept `(company, context)` → return `Dict[str, Any]`
+- **Error Handling**: Structured exceptions (`AgentError`, `ValidationError`, `TimeoutError`)
+- **Cost Tracking**: Automatic token usage and cost calculation per execution
+- **Async-First**: All I/O operations use `async/await` for concurrency
+- **Configurable**: Settings injected via `get_settings()` for environment-specific config
+
+---
+
+## Agent Registry (ManagerAgent)
+
+```python
+class ManagerAgent:
+    def __init__(self):
+        self.agents: Dict[str, BaseWorkerAgent] = {}
+        self._register_default_agents()
+    
+    def _register_default_agents(self):
+        self.agents["financial_document"] = FinancialDocumentAgent()
+        self.agents["sentiment"] = SentimentAnalysisAgent()
+        self.agents["risk"] = RiskAssessmentAgent()
+        # ... 11 more agents
+        self.agents["research_planner"] = ResearchPlannerAgent()
+    
+    def register_agent(self, name: str, agent: BaseWorkerAgent):
+        self.agents[name] = agent
+    
+    def get_agent(self, name: str) -> BaseWorkerAgent:
+        return self.agents.get(name)
+    
+    async def check_health(self) -> Dict[str, AgentHealth]:
+        # Checks all registered agents
+```
+
+---
+
+## 14 Specialized Agents
+
+| Agent | Purpose | Key Dependencies | Avg Latency |
+|-------|---------|------------------|-------------|
+| **FinancialDocument** | RAG over SEC filings, earnings, reports | `data/filings`, `rag/vector_store`, `data/financial_documents` | ~60s |
+| **SentimentAnalysis** | Multi-source sentiment with credibility weighting | `data/news/aggregator`, `data/news/intelligence` | ~30s |
+| **RiskAssessment** | VaR/CVaR, stress testing, 4 risk categories | `data/portfolio`, `data/analytics` | ~45s |
+| **CompetitiveIntelligence** | Peer comparison, positioning | `data/portfolio`, `data/financial_documents` | ~45s |
+| **NewsAgent** | 6 providers, dedup, events, entities | `data/news/aggregator`, `data/news/intelligence`, `data/news/summarizer` | ~30s |
+| **MarketData** | Real-time quotes, technicals, fundamentals | `data/market_data/adapter`, `data/market_data/real_providers` | ~15s |
+| **InvestmentSummary** | Multi-agent synthesis, thesis formulation | All other agents (synthesis) | ~30s |
+| **KnowledgeGraph** | 14 node types, 28 edges, graph algorithms | `data/knowledge_graph` | ~30s |
+| **Portfolio** | Positions, VaR, Monte Carlo, 5 rebalance strategies | `data/portfolio`, `data/analytics` | ~30s |
+| **PatternDetection** | 10 patterns with backtesting | `data/patterns`, `data/analytics` | ~30s |
+| **Alerts** | 30+ types, 5 channels, dedup/cooldown | `data/alerts` | ~15s |
+| **Analytics** | FF3/5, Monte Carlo (10K), Brinson attribution | `data/analytics` | ~60s |
+| **HistoricalIntelligence** | Time-series, trends, evolution, peer comparison | `data/intelligence/historical` | ~45s |
+| **CrossAgentMemory** | 9 types, 5 scopes, supersession, linking | `data/memory`, `memory/enhanced` | ~10s |
+| **ResearchPlanner** | LLM-driven planning, 4 complexity levels | `llm/orchestration`, 14 agent types | ~5s (planning) |
+
+---
+
+## Communication Protocol
+
+### Standard Input (All Agents)
+```python
+{
+    "company": "NVDA",
+    "query": "Analyze competitive position in AI chips",
+    "context": {
+        "financial_metrics": {...},
+        "sentiment": {...},
+        "risk_factors": [...],
+        "news_events": [...],
+        "market_data": {...},
+        "peer_comparison": {...},
+        "patterns": [...],
+        "risk_assessment": {...}
+    }
+}
+```
+
+### Standard Output (All Agents)
+```python
+{
+    "agent_type": "risk_assessment",
+    "status": "completed",
+    "data": {...},
+    "confidence": 0.87,
+    "citations": [
+        {"chunk_id": "abc123", "source": "NVDA 10-K", "section": "Item 1A", "excerpt": "...", "relevance": 0.94}
+    ],
+    "metadata": {
+        "execution_time_ms": 45000,
+        "tokens_used": 1250,
+        "cost_usd": 0.03
+    }
+}
+```
+
+---
+
+## Agent Lifecycle Management
+
+```mermaid
+stateDiagram-v2
+    [*] --> Registration
+    Registration --> HealthCheck
+    HealthCheck --> Ready
+    Ready --> Execution: run() called
+    Execution --> Success: completed
+    Execution --> TransientError: network/timeout
+    TransientError --> Retry: exponential backoff
+    Retry --> Execution
+    TransientError --> CircuitOpen: max retries
+    CircuitOpen --> HalfOpen: timeout
+    HalfOpen --> Closed: success
+    HalfOpen --> Open: failure
+    Execution --> Fallback: permanent failure
+    Fallback --> Ready
+    Ready --> HealthCheck: periodic
+```
+
+**Retry Logic**:
+- Max retries: 3 (configurable per agent)
+- Backoff: 60s, 120s, 240s (exponential)
+- Circuit Breaker: 5 failures → 60s open → half-open test
+
+**Graceful Degradation**:
+- Primary agent fails → fallback agent (if configured)
+- All failures logged with correlation IDs
+- Partial results preserved in context
+
+---
+
+## Configuration (Environment Variables)
+
+```bash
+# Financial Document Agent
+FINANCIAL_DOC_MAX_PAGES=100
+FINANCIAL_DOC_CHUNK_SIZE=1000
+FINANCIAL_DOC_CHUNK_OVERLAP=200
+
+# Sentiment Agent
+SENTIMENT_TIMEFRAME_DAYS=30
+SENTIMENT_SOURCE_WEIGHTS='{"tier1": 1.0, "tier2": 0.8, "tier3": 0.5}'
+
+# Risk Agent
+RISK_VAR_CONFIDENCE=0.95
+RISK_STRESS_SCENARIOS=10000
+
+# News Agent
+NEWS_TIMEFRAME_DAYS=7
+NEWS_DEDUP_THRESHOLD=0.85
+NEWS_MAX_ARTICLES=100
+
+# Market Data
+MARKET_DATA_CACHE_TTL=300
+MARKET_DATA_PROVIDERS="yahoo,alphavantage,finnhub"
+```
+
+---
+
+*Document Version: 1.0*  
+*Last Updated: 2026-07-18*  
+*Platform: Agentic Financial Intelligence Platform v1.7.0-phase8*

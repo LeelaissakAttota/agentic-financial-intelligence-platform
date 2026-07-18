@@ -1,0 +1,150 @@
+```mermaid
+graph TB
+    subgraph "Local Development"
+        DOCKER_COMPOSE[docker-compose.yml<br/>5 services: api, streamlit, postgres, chromadb, redis]
+        DEV_ENV[.env file<br/>API keys, config]
+        HOT_RELOAD[Hot Reload<br/>Volumes: ./src → /app/src]
+    end
+
+    subgraph "Staging (Kubernetes)"
+        ST_NS[Namespace: financial-research-staging]
+        ST_CONFIG[ConfigMap<br/>Non-secret config]
+        ST_SECRETS[SealedSecrets / ExternalSecrets<br/>API keys, passwords]
+        ST_API[Deployment: financial-research-api<br/>replicas: 3, rolling update]
+        ST_STREAMLIT[Deployment: financial-research-streamlit<br/>replicas: 2]
+        ST_INGRESS[Ingress: nginx<br/>TLS: cert-manager (Let's Encrypt staging)]
+        ST_HPA[HPA: CPU 70%, Memory 80%<br/>min: 3, max: 10]
+        ST_PDB[PDB: minAvailable 2]
+        ST_PROM[ServiceMonitor<br/>Prometheus scraping]
+        ST_GRAFANA[Grafana Dashboards<br/>API, Agent, Business metrics]
+    end
+
+    subgraph "Production (Kubernetes)"
+        PROD_NS[Namespace: financial-research-prod]
+        PROD_CONFIG[ConfigMap<br/>Production config]
+        PROD_SECRETS[SealedSecrets / ExternalSecrets<br/>Production secrets]
+        PROD_API[Deployment: financial-research-api<br/>replicas: 6, zero-downtime]
+        PROD_STREAMLIT[Deployment: financial-research-streamlit<br/>replicas: 3]
+        PROD_INGRESS[Ingress: nginx<br/>TLS: cert-manager (Let's Encrypt prod)]
+        PROD_HPA[HPA: CPU 70%, Memory 80%<br/>min: 6, max: 20]
+        PROD_PDB[PDB: minAvailable 4]
+        PROD_TOPOLOGY[Topology Spread<br/>3 AZs, maxSkew: 1]
+        PROD_PROM[ServiceMonitor + PodMonitor]
+        PROD_ALERTS[PrometheusRules<br/>Latency, Errors, Cost, Capacity]
+        PROD_GRAFANA[Grafana: API, Agent, DB, Cache, Business]
+        PROD_LOGGING[EFK Stack<br/>Elasticsearch, Fluent Bit, Kibana]
+    end
+
+    subgraph "Data Layer (Managed Services)"
+        RDS[AWS RDS Aurora PostgreSQL<br/>Multi-AZ, 3 AZs<br/>Read replicas: 2<br/>Backup: 30 days, PITR<br/>Encryption: KMS]
+        ELASTICACHE[AWS ElastiCache Redis<br/>Cluster mode: 3 shards<br/>Multi-AZ failover<br/>Encryption: in-transit + at-rest]
+        CHROMA_K8S[ChromaDB on K8s<br/>StatefulSet: 3 replicas<br/>PVC: gp3 100Gi<br/>Backup: Daily snapshot]
+        S3[S3 Bucket<br/>Document storage, backups<br/>Versioning, lifecycle rules]
+    end
+
+    subgraph "External Dependencies"
+        SEC_API[SEC EDGAR<br/>Rate limit: 10 req/s]
+        NEWS_APIS[6 News Providers<br/>Yahoo, Finnhub, AlphaVantage, NewsAPI, RSS, Google]
+        MARKET_APIS[Market Data<br/>Yahoo, AlphaVantage, Finnhub]
+        OPENROUTER[OpenRouter<br/>9 LLM models]
+    end
+
+    subgraph "CI/CD Pipeline"
+        GITHUB_ACTIONS[GitHub Actions<br/>.github/workflows/]
+        
+        subgraph "CI Pipeline"
+            LINT[Ruff Lint]
+            FORMAT[Black Format Check]
+            TYPE[MyPy Type Check]
+            SECURITY[Bandit Security Scan]
+            TEST[Pytest: 396 tests]
+            COVERAGE[Coverage Report]
+        end
+        
+        subgraph "Build"
+            DOCKER_BUILD[Docker Buildx<br/>Multi-stage, cache]
+            SCAN[Trivy Container Scan]
+            PUSH[Push to GHCR<br/>Tags: sha, semver, latest]
+        end
+        
+        subgraph "Deploy Staging"
+            DEPLOY_STAGE[Kubectl Set Image<br/>Staging namespace]
+            ROLLOUT_STAGE[Rollout Status<br/>Timeout: 5min]
+            SMOKE_STAGE[Smoke Tests<br/>Health + API]
+        end
+        
+        subgraph "Deploy Production"
+            RELEASE[GitHub Release<br/>Tag: v1.7.0-phase8]
+            DEPLOY_PROD[Kubectl Set Image<br/>Production namespace]
+            ROLLOUT_PROD[Rollout Status<br/>Timeout: 10min]
+            SMOKE_PROD[Smoke Tests<br/>Full API verification]
+            NOTIFY[Slack/Discord Notification]
+        end
+    end
+
+    subgraph "Observability Stack"
+        PROMETHEUS[Prometheus<br/>Retention: 30d<br/>Storage: 50Gi]
+        ALERTMANAGER[Alertmanager<br/>Routes: PagerDuty, Slack, Email]
+        GRAFANA[Grafana<br/>Dashboards: API, Agent, DB, Cache, Business]
+        LOKI[Loki<br/>Log aggregation<br/>Retention: 14d]
+        TEMPO[Tempo<br/>Distributed tracing<br/>Retention: 7d]
+    end
+
+    %% Connections
+    DOCKER_COMPOSE --> DEV_ENV
+    DOCKER_COMPOSE --> HOT_RELOAD
+
+    GITHUB_ACTIONS --> LINT
+    LINT --> FORMAT
+    FORMAT --> TYPE
+    TYPE --> SECURITY
+    SECURITY --> TEST
+    TEST --> COVERAGE
+    COVERAGE --> DOCKER_BUILD
+    DOCKER_BUILD --> SCAN
+    SCAN --> PUSH
+    PUSH --> DEPLOY_STAGE
+    DEPLOY_STAGE --> ROLLOUT_STAGE
+    ROLLOUT_STAGE --> SMOKE_STAGE
+    SMOKE_STAGE --> RELEASE
+    RELEASE --> DEPLOY_PROD
+    DEPLOY_PROD --> ROLLOUT_PROD
+    ROLLOUT_PROD --> SMOKE_PROD
+    SMOKE_PROD --> NOTIFY
+
+    ST_API --> RDS
+    ST_API --> ELASTICACHE
+    ST_API --> CHROMA_K8S
+    ST_STREAMLIT --> ST_API
+
+    PROD_API --> RDS
+    PROD_API --> ELASTICACHE
+    PROD_API --> CHROMA_K8S
+    PROD_STREAMLIT --> PROD_API
+
+    ST_API --> SEC_API
+    ST_API --> NEWS_APIS
+    ST_API --> MARKET_APIS
+    ST_API --> OPENROUTER
+    PROD_API --> SEC_API
+    PROD_API --> NEWS_APIS
+    PROD_API --> MARKET_APIS
+    PROD_API --> OPENROUTER
+
+    ST_PROM --> PROMETHEUS
+    PROD_PROM --> PROMETHEUS
+    PROD_LOGGING --> LOKI
+    PROD_LOGGING --> TEMPO
+    PROMETHEUS --> ALERTMANAGER
+    ALERTMANAGER --> GRAFANA
+    LOKI --> GRAFANA
+    TEMPO --> GRAFANA
+
+    style DOCKER_COMPOSE fill:#e3f2fd
+    style ST_API fill:#fce4ec
+    style PROD_API fill:#fce4ec
+    style RDS fill:#f3e5f5
+    style ELASTICACHE fill:#fff3e0
+    style GITHUB_ACTIONS fill:#e8f5e9
+    style PROMETHEUS fill:#e0f2f1
+```

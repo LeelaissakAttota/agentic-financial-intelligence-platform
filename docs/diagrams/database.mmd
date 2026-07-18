@@ -1,0 +1,206 @@
+```mermaid
+graph TB
+    subgraph "PostgreSQL Core Tables"
+        COMPANIES[companies<br/>id, name, ticker, cik, sector, industry, market_cap]
+        REPORTS[reports<br/>id, company_id, json_payload, generated_at]
+        AGENT_RUNS[agent_runs<br/>id, report_id, agent_name, input/output_payload, tokens, cost, status, timestamp]
+    end
+
+    subgraph "Phase 5: Knowledge Intelligence"
+        KG_NODES[kg_nodes<br/>id, node_type, name, properties, embedding]
+        KG_EDGES[kg_edges<br/>id, source_id, target_id, relationship_type, properties, weight]
+        PORTFOLIOS[portfolios<br/>id, name, owner_id, base_currency]
+        POSITIONS[positions<br/>id, portfolio_id, symbol, quantity, avg_cost, market_value]
+        TRANSACTIONS[transactions<br/>id, portfolio_id, symbol, side, quantity, price, commission]
+        PATTERNS[patterns<br/>id, pattern_type, symbol, timeframe, detected_at, confidence, metadata]
+        ALERTS[alerts<br/>id, watchlist_id, rule_id, symbol, triggered_at, severity, message]
+        ALERT_RULES[alert_rules<br/>id, watchlist_id, name, condition_type, parameters, severity, channels]
+        ANALYTICS_RUNS[analytics_runs<br/>id, analysis_type, parameters, results, status]
+        FACTOR_EXPOSURES[factor_exposures<br/>id, run_id, factor_name, exposure, t_stat, p_value]
+        MC_PATHS[monte_carlo_paths<br/>id, run_id, path_index, final_value, max_drawdown]
+        HISTORICAL[historical_data<br/>id, company_id, data_type, timestamp, value, source]
+        AGENT_MEMORY[agent_memory<br/>id, memory_type, scope, scope_key, content, confidence, source_agent, supersedes_id, linked_memories, tags, access_count, expires_at]
+    end
+
+    subgraph "Phase 7: Autonomous Research"
+        RESEARCH_SESSIONS[research_sessions<br/>id, company, query, plan_id, status, steps, results, conclusions, reports, started_at, completed_at]
+    end
+
+    subgraph "Phase 8: AI Copilot"
+        COPILOT_SESSIONS[copilot_sessions<br/>id, user_id, company, mode, status, context, total_tokens, total_cost, created_at, completed_at]
+        CONVERSATIONS[conversations<br/>id, session_id, user_id, title, status, summary, token_count]
+        MESSAGES[conversation_messages<br/>id, conversation_id, role, content, metadata, tool_calls, tool_call_id, timestamp]
+        DECISIONS[decision_history<br/>id, session_id, conversation_id, question, decision_type, conclusion, confidence, reasoning, explanation, evidence, alternatives, risk_factors, assumptions, model_used, tokens_used, cost_usd, latency_ms]
+        TOOL_EXECS[tool_executions<br/>id, session_id, tool_name, category, parameters, result, status, duration_seconds, tokens_used, cost_usd]
+        WORKFLOW_EXECS[workflow_executions<br/>id, session_id, plan_id, company, goal, complexity, tasks, status, current_step, step_results, total_duration, total_cost, total_tokens]
+    end
+
+    subgraph "Phase 8: Enhanced Memory"
+        LTM[long_term_memory<br/>id, scope, scope_key, content, memory_type, importance, confidence, access_count, last_accessed, expires_at, tags, source, supersedes_id, linked_memories]
+        CONV_MEM[conversation_memory<br/>id, user_id, session_id, messages, topics, entities_mentioned, decisions_made, tools_used, agents_consulted, summary, sentiment, message_count]
+        USER_PREFS[user_preferences<br/>user_id, preferences, interaction_patterns, confidence, interaction_count]
+        DEC_HIST[decision_history<br/>id, user_id, session_id, decision_id, question, decision_type, conclusion, confidence, outcome, outcome_accuracy, feedback]
+        TOOL_ANAL[tool_usage_analytics<br/>id, user_id, session_id, tool_name, category, parameters, result_summary, success, duration_ms, tokens_used, cost_usd, timestamp]
+    end
+
+    subgraph "ChromaDB Vector Collections"
+        COL_DOCS[financial_docs<br/>SEC filings, earnings, reports<br/>1024-dim BGE-M3]
+        COL_NEWS[news_articles<br/>News articles, embeddings<br/>1024-dim BGE-M3]
+        COL_EARNINGS[earnings_transcripts<br/>Earnings call transcripts<br/>1024-dim BGE-M3]
+        COL_ANALYST[analyst_reports<br/>Analyst reports<br/>1024-dim BGE-M3]
+        COL_MARKET[market_data<br/>Market data embeddings<br/>1024-dim BGE-M3]
+    end
+
+    subgraph "Redis Cache"
+        REDIS_SESSION[session:{session_id}<br/>24h TTL]
+        REDIS_RATE[ratelimit:{key}<br/>1m-1h TTL]
+        REDIS_TOOL[tool:{tool}:{hash}<br/>5m-1h TTL]
+        REDIS_LLM[llm:{model}:{hash}<br/>1h TTL]
+        REDIS_MKT[market:{ticker}:quote<br/>5m TTL]
+    end
+
+    %% Relationships
+    COMPANIES --> REPORTS
+    REPORTS --> AGENT_RUNS
+    COMPANIES --> KG_NODES
+    KG_NODES --> KG_EDGES
+    PORTFOLIOS --> POSITIONS
+    PORTFOLIOS --> TRANSACTIONS
+    COMPANIES --> PATTERNS
+    COMPANIES --> ALERTS
+    ALERT_RULES --> ALERTS
+    ANALYTICS_RUNS --> FACTOR_EXPOSURES
+    ANALYTICS_RUNS --> MC_PATHS
+    COMPANIES --> HISTORICAL
+    COMPANIES --> AGENT_MEMORY
+    COMPANIES --> RESEARCH_SESSIONS
+
+    COPILOT_SESSIONS --> CONVERSATIONS
+    CONVERSATIONS --> MESSAGES
+    COPILOT_SESSIONS --> DECISIONS
+    COPILOT_SESSIONS --> TOOL_EXECS
+    COPILOT_SESSIONS --> WORKFLOW_EXECS
+
+    COPILOT_SESSIONS --> LTM
+    COPILOT_SESSIONS --> CONV_MEM
+    COPILOT_SESSIONS --> USER_PREFS
+    COPILOT_SESSIONS --> DEC_HIST
+    COPILOT_SESSIONS --> TOOL_ANAL
+
+    COMPANIES -.-> COL_DOCS
+    COMPANIES -.-> COL_NEWS
+    COMPANIES -.-> COL_EARNINGS
+    COMPANIES -.-> COL_ANALYST
+    COMPANIES -.-> COL_MARKET
+
+    style COMPANIES fill:#e3f2fd
+    style REPORTS fill:#e3f2fd
+    style AGENT_RUNS fill:#e3f2fd
+    style COPILOT_SESSIONS fill:#fce4ec
+    style CONVERSATIONS fill:#fce4ec
+    style DECISIONS fill:#fce4ec
+    style LTM fill:#e8f5e9
+    style CONV_MEM fill:#e8f5e9
+    style USER_PREFS fill:#e8f5e9
+    style COL_DOCS fill:#f3e5f5
+```
+
+---
+
+# Database Schema Diagram
+
+**Purpose**: Complete database schema visualization showing all 27+ tables across 4 phases, plus ChromaDB collections and Redis cache patterns.
+
+**Schema Evolution**:
+
+### Phase 1-4: Core Tables
+| Table | Purpose | Key Relationships |
+|-------|---------|-------------------|
+| `companies` | Company master data | Primary key for all financial data |
+| `reports` | Generated research reports | FK → companies |
+| `agent_runs` | Agent execution audit trail | FK → reports, companies |
+
+### Phase 5: Knowledge Intelligence (13 tables)
+| Table | Purpose | Key Indexes |
+|-------|---------|-------------|
+| `kg_nodes` | Knowledge graph entities | node_type, name, embedding (pgvector) |
+| `kg_edges` | Knowledge graph relationships | source_id, target_id, relationship_type |
+| `portfolios` | Portfolio definitions | owner_id |
+| `positions` | Portfolio holdings | portfolio_id, symbol |
+| `transactions` | Trade history | portfolio_id, symbol |
+| `patterns` | Detected patterns | symbol, pattern_type, detected_at |
+| `alerts` | Triggered alerts | watchlist_id, symbol, triggered_at |
+| `alert_rules` | Alert configurations | watchlist_id |
+| `analytics_runs` | Analytics executions | analysis_type, status |
+| `factor_exposures` | Factor model results | run_id |
+| `monte_carlo_paths` | Simulation paths | run_id |
+| `historical_data` | Time-series storage | company_id, data_type, timestamp |
+| `agent_memory` | Cross-agent memory | scope, scope_key, memory_type |
+
+### Phase 7: Autonomous Research (1 table)
+| Table | Purpose | Key Indexes |
+|-------|---------|-------------|
+| `research_sessions` | Autonomous research workflows | company, status, started_at |
+
+### Phase 8: AI Copilot (11 tables)
+| Table | Purpose | Key Indexes |
+|-------|---------|-------------|
+| `copilot_sessions` | User copilot sessions | user_id, company, status |
+| `conversations` | Chat conversations | session_id, user_id |
+| `conversation_messages` | Message history | conversation_id, timestamp |
+| `decision_history` | Decision audit trail | session_id, conversation_id |
+| `tool_executions` | Tool usage tracking | session_id, tool_name |
+| `workflow_executions` | Workflow tracking | session_id, company, status |
+| `long_term_memory` | Enhanced memory | scope, scope_key, importance |
+| `conversation_memory` | Chat context | user_id, session_id |
+| `user_preferences` | Learned preferences | user_id (PK) |
+| `decision_history` | Outcome tracking | user_id, session_id |
+| `tool_usage_analytics` | Tool analytics | user_id, tool_name, timestamp |
+
+---
+
+**ChromaDB Collections** (Vector Store):
+| Collection | Content | Dimensions | Embedding Model |
+|------------|---------|------------|-----------------|
+| `financial_docs` | SEC filings, earnings, reports | 1024 | BGE-M3 |
+| `news_articles` | News articles | 1024 | BGE-M3 |
+| `earnings_transcripts` | Earnings calls | 1024 | BGE-M3 |
+| `analyst_reports` | Analyst reports | 1024 | BGE-M3 |
+| `market_data` | Market data embeddings | 1024 | BGE-M3 |
+
+---
+
+**Redis Cache Patterns**:
+| Pattern | TTL | Purpose |
+|---------|-----|---------|
+| `session:{id}` | 24h | User session data |
+| `ratelimit:{key}` | 1m-1h | Distributed rate limiting |
+| `tool:{tool}:{hash}` | 5m-1h | Tool result caching |
+| `llm:{model}:{hash}` | 1h | LLM response caching |
+| `market:{ticker}:quote` | 5m | Real-time market data |
+
+---
+
+**Critical Indexes**:
+```sql
+-- Company lookups
+CREATE INDEX idx_companies_ticker ON companies(ticker);
+CREATE INDEX idx_companies_cik ON companies(cik);
+
+-- Agent runs
+CREATE INDEX idx_agent_runs_report ON agent_runs(report_id);
+CREATE INDEX idx_agent_runs_agent ON agent_runs(agent_name);
+CREATE INDEX idx_agent_runs_timestamp ON agent_runs(timestamp DESC);
+
+-- Knowledge Graph
+CREATE INDEX idx_kg_nodes_type ON kg_nodes(node_type);
+CREATE INDEX idx_kg_edges_source ON kg_edges(source_id);
+CREATE INDEX idx_kg_edges_target ON kg_edges(target_id);
+
+-- Phase 8
+CREATE INDEX idx_copilot_user ON copilot_sessions(user_id);
+CREATE INDEX idx_msg_conversation ON conversation_messages(conversation_id);
+CREATE INDEX idx_decision_session ON decision_history(session_id);
+CREATE INDEX idx_ltm_scope_key ON long_term_memory(scope, scope_key);
+CREATE INDEX idx_ltm_importance ON long_term_memory(importance);
+```

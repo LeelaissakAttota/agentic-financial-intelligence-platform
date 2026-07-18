@@ -1,0 +1,158 @@
+```mermaid
+graph TB
+    subgraph "Research Planner (Phase 7)"
+        QUERY[User Query<br/>"Analyze NVDA competitive position"]
+        COMPLEXITY[Complexity Analysis<br/>LLM-driven: 4 levels]
+        SELECT[Dynamic Agent Selection<br/>From 14 available agents]
+        DEPS[Dependency Graph<br/>Topological ordering]
+        PARALLEL[Parallel Groups<br/>Data Collection, Analysis1, Analysis2, Synthesis]
+        DURATION[Duration Estimation<br/>Per-agent + total]
+        PLAN[ExecutionPlan<br/>Steps, deps, parallel groups]
+    end
+
+    subgraph "Workflow Orchestrator (Phase 7)"
+        TOPO[Topological Sort<br/>Resolve dependencies into waves]
+        WAVES[Execution Waves<br/>Wave 1: no deps → Wave 2: depends on 1 → etc.]
+        SEMAPHORE[Bounded Concurrency<br/>Semaphore: max 4 parallel]
+        RETRY[Retry Logic<br/>Exponential backoff: 1m, 2m, 4m]
+        CONTEXT[Context Propagation<br/>Shared dict passed to dependent steps]
+        MEMORY[Memory Integration<br/>Auto-store agent outputs]
+        CALLBACKS[Progress Callbacks<br/>Real-time step-level tracking]
+    end
+
+    subgraph "Execution Waves Example"
+        WAVE1[Wave 1: Data Collection<br/>• Financial Document<br/>• News Intelligence<br/>• Market Data<br/>(Parallel, no deps)]
+        WAVE2[Wave 2: Analysis 1<br/>• Sentiment<br/>• Risk Assessment<br/>(Depends on Wave 1)]
+        WAVE3[Wave 3: Analysis 2<br/>• Competitive Intel<br/>• Pattern Detection<br/>(Depends on Wave 1-2)]
+        WAVE4[Wave 4: Synthesis<br/>• Investment Summary<br/>(Depends on Wave 2-3)]
+    end
+
+    subgraph "Human Approval (Phase 7)"
+        APPROVAL[Approval Request<br/>6 action types]
+        CHAIN[Sequential Chain<br/>Analyst → Senior → Manager]
+        ESCALATE[Escalation<br/>Auto-add next level]
+        DELEGATE[Delegation<br/>Transfer to another user]
+        AUDIT[Full Audit Trail<br/>Every action logged]
+    end
+
+    subgraph "Copilot Workflows (Phase 8)"
+        INTENT[Intent Classification<br/>8 intent types]
+        CONTEXT_BUILD[Context Builder<br/>Company extraction, history]
+        PLAN_MODE[Execution Modes<br/>plan_only, auto_execute, interactive, consulting]
+        TOOL_SELECT[Tool Selection<br/>Confidence-based, 15 tools]
+        DECISION[Decision Engine<br/>6-step reasoning]
+        EXPLAIN[Explainability<br/>Evidence, alternatives, risks]
+        MEMORY_ACCESS[Memory Access<br/>5 scopes, 5 importance levels]
+    end
+
+    subgraph "Multi-Agent Collaboration (Phase 8)"
+        COORD[Coordinator<br/>10 signals, mailboxes]
+        DELEGATE_MGR[Delegation Manager<br/>Capability-based routing]
+        CONSENSUS[Consensus Builder<br/>5 voting methods]
+        KG_CLIENT[Knowledge Graph Client<br/>Entity context, paths]
+    end
+
+    QUERY --> COMPLEXITY
+    COMPLEXITY --> SELECT
+    SELECT --> DEPS
+    DEPS --> PARALLEL
+    PARALLEL --> DURATION
+    DURATION --> PLAN
+
+    PLAN --> TOPO
+    TOPO --> WAVES
+    WAVES --> SEMAPHORE
+    SEMAPHORE --> RETRY
+    RETRY --> CONTEXT
+    CONTEXT --> MEMORY
+    MEMORY --> CALLBACKS
+
+    WAVES --> WAVE1
+    WAVE1 --> WAVE2
+    WAVE2 --> WAVE3
+    WAVE3 --> WAVE4
+
+    PLAN --> APPROVAL
+    APPROVAL --> CHAIN
+    CHAIN --> ESCALATE
+    ESCALATE --> DELEGATE
+    DELEGATE --> AUDIT
+
+    PLAN --> INTENT
+    INTENT --> CONTEXT_BUILD
+    CONTEXT_BUILD --> PLAN_MODE
+    PLAN_MODE --> TOOL_SELECT
+    TOOL_SELECT --> DECISION
+    DECISION --> EXPLAIN
+    EXPLAIN --> MEMORY_ACCESS
+
+    PLAN --> COORD
+    COORD --> DELEGATE_MGR
+    DELEGATE_MGR --> CONSENSUS
+    CONSENSUS --> KG_CLIENT
+
+    style PLAN fill:#e3f2fd
+    style WAVES fill:#e8f5e9
+    style APPROVAL fill:#fff3e0
+    style INTENT fill:#fce4ec
+    style COORD fill:#f3e5f5
+```
+
+---
+
+# Workflow Architecture Diagram
+
+**Purpose**: Visualizes the complete workflow pipeline from research planning through execution, approval, and Phase 8 Copilot orchestration.
+
+**Key Stages**:
+
+### 1. Research Planner (Phase 7)
+- **Input**: Natural language query + company
+- **Process**: LLM-driven complexity analysis (4 levels) → Dynamic agent selection (from 14) → Dependency graph → Parallel group identification → Duration estimation
+- **Output**: `ExecutionPlan` with steps, dependencies, parallel groups, time estimates
+
+### 2. Workflow Orchestrator (Phase 7)
+- **Topological Sort**: Resolves dependencies into sequential waves
+- **Bounded Parallelism**: Semaphore limits concurrent agents (default 4)
+- **Retry Logic**: Exponential backoff (1min, 2min, 4min) with max retries
+- **Context Propagation**: Shared context dictionary passed between dependent steps
+- **Memory Integration**: Automatic storage of agent outputs for cross-agent access
+- **Progress Callbacks**: Real-time execution tracking
+
+### 3. Execution Waves (Example)
+| Wave | Agents | Dependencies |
+|------|--------|--------------|
+| 1 | Financial Doc, News, Market Data | None (parallel) |
+| 2 | Sentiment, Risk | Wave 1 complete |
+| 3 | Competitive, Patterns | Wave 1-2 complete |
+| 4 | Investment Summary | Wave 2-3 complete |
+
+### 4. Human Approval Workflow (Phase 7)
+- **6 Action Types**: APPROVE, REJECT, REQUEST_CHANGES, ESCALATE, DELEGATE, COMMENT
+- **Sequential Chains**: Analyst → Senior Analyst → Manager
+- **Escalation**: Auto-add escalated approvers with metadata
+- **Delegation**: Transfer approval to another user
+- **Audit Trail**: Every action logged with user, timestamp, comment, metadata
+
+### 5. Copilot Orchestration (Phase 8)
+- **Intent Classification**: 8 intents (research, plan, tool, report, watchlist, memory, status, conversational)
+- **Context Building**: Company extraction, conversation history, active plan tracking
+- **Execution Modes**: plan_only, auto_execute, interactive, consulting
+- **Tool Selection**: Confidence-based from 15 tools across 14 categories
+- **Decision Engine**: 6-step reasoning (Evidence → Hypothesis → Evaluation → Alternatives → Risk → Synthesis)
+- **Explainability**: Evidence, Bear/Base/Bull alternatives, risk factors, assumptions
+- **Memory**: 5 scopes (Global, User, Session, Company, Agent), 5 importance levels
+
+### 6. Multi-Agent Collaboration (Phase 8)
+- **Coordinator**: 10 coordination signals, agent mailboxes, finding sharing, conflict detection
+- **Delegation Manager**: Capability-based task routing, load balancing, success rate tracking
+- **Consensus Builder**: 5 voting methods (majority, weighted, unanimous, threshold, borda)
+- **Knowledge Graph**: Entity context, paths, communities, centrality, similarity queries
+
+---
+
+**Complexity Levels & Agent Counts**:
+- **SIMPLE**: 3-4 agents, 1 wave, ~60-90s
+- **MODERATE**: 5-7 agents, 2 waves, ~90-180s
+- **COMPLEX**: 8-10 agents, 3 waves, ~180-300s
+- **COMPREHENSIVE**: 11-14 agents, 4 waves, ~300-600s
